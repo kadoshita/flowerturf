@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+<head>
+	<title>WebRTC音声チャット</title>
+	<script type="text/javascript">
+		function login(){
+			var user=document.getElementById("user");
+			location.href="./chat.html?"+user.value;
+			alert(user.value+"としてログインします");
+		}
+	</script>
+</head>
+<body>
+<p>ユーザー名を入力してください</p>
+<form>
+	<input type="text" id="user"></input>
+	<input type="submit" onClick="login()" value="ログイン"></input>
+</form>
+</body>
+</html>
