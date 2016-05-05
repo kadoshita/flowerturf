@@ -63,7 +63,7 @@ function start() {
 		if(data.length > 0) {
 			var time=new getTime();
 			data = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-			$("p.receive").append('<p class=\"time\">'+time[0]+':'+time[1]+':'+time[2]+'</p>'+data + "<br><hr>");
+			$("p.receive").append('<p class=\"time\">'+time[0]+':'+time[1]+':'+time[2]+'</p>'getUser()+'さん<br>'+data + "<br><hr>");
 
 			// メッセージを接続中のpeerに送信する
 			multiparty.send(data);
