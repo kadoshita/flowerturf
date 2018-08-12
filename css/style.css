@@ -3,6 +3,9 @@ body{
     color: #fafafa;
     text-align: center;
 }
+video{
+    display: none;
+}
 
 .title{
     margin-top: 20%;
@@ -12,6 +15,12 @@ body{
     height: 50%;
     border: solid 2px white;
     border-radius: 4px;
+}
+.local-user{
+    border-color: #c00f0f;
+}
+.active-user{
+    border-color: #00ce00;
 }
 .user-icon{
     width: 50%;
