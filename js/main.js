@@ -3,6 +3,10 @@ $(document).ready(()=>{
     let room=null;
     let localStream=null;
     let remoteStreams={};
+    let userdata={
+        username:''
+    };
+    let usersdata={};
 
     $.getJSON('/js/apikey.json',(data)=>{
         peer=new Peer({
@@ -12,7 +16,10 @@ $(document).ready(()=>{
     });
     $('#joinroombtn').on('click',()=>{
         let roomname=$('#roomnameipt').val();
-        $('#localusername').text(peer.id);
+        let username=$('#usernameipt').val();
+        userdata.username=username;
+        usersdata[peer.id]=userdata;
+        $('#localusername').text(username?username:peer.id);
         if(roomname){
             $('#roomnametxt').text(roomname);
             $('#joinroom').toggle();
@@ -23,6 +30,7 @@ $(document).ready(()=>{
                 localStream=stream;
                 $('#myvideo').get(0).srcObject=stream;
                 room=peer.joinRoom(roomname,{mode:'sfu',stream:stream});
+                userdata.username=username;
                 connect(room);
             })
             .catch(e=>{
@@ -35,6 +43,8 @@ $(document).ready(()=>{
         room=null;
         localStream.getTracks().forEach(track => track.stop());
         localStream=null;
+        userdata={};
+        usersdata={};
         $('#myvideo').get(0).srcObject=null;
         removeChatUserElms();
         $('#joinroom').toggle();
@@ -51,6 +61,9 @@ $(document).ready(()=>{
     });
 
     let connect=_room=>{
+        _room.on('open',()=>{
+            _room.send(userdata);
+        });
         _room.on('stream',stream=>{
             console.log(stream);
             addChatUserElm(stream.peerId);
@@ -60,19 +73,28 @@ $(document).ready(()=>{
         })
         _room.on('data',msg=>{
             console.log(msg);
+            if(msg.data.username){
+                usersdata[msg.src]={
+                    username:msg.data.username
+                };
+                $(`#${msg.src}-name`).text(msg.data.username);
+            }
         });
         _room.on('peerJoin',id=>{
             console.log(id);
+            _room.send(userdata);
         });
         _room.on('peerLeave',id=>{
             console.log(id);
+            remoteStreams[id]=null;
+            usersdata[id]=null;
             removeChatUserElm(id);
         });
     };
     let addChatUserElm=(id)=>{
         let _elm=`
         <div id="${id}" class="col-md-3 chat-user active-user">
-            <h4 class="card-title">${id}</h4>
+            <h4 id="${id}-name" class="modal-title">${(usersdata[id]?usersdata[id].username:id)}</h4>
             <img class="img-thumbnail user-icon" src="https://placehold.jp/150x150.png">
             <video id="${id}-video" autoplay></video>
 

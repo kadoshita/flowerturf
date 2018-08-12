@@ -26,7 +26,11 @@
                     <form>
                         <div class="form-group">
                             <label>Room Name</label>
-                            <input type="text" id="roomnameipt" class="form-control form-control-dark">
+                            <input type="text" id="roomnameipt" class="form-control form-control-dark" required>
+                        </div>
+                        <div class="form-group">
+                            <label>User Name</label>
+                            <input type="text" id="usernameipt" class="form-control form-control-dark">
                         </div>
                         <button type="button" id="joinroombtn" class="btn btn-light">Join Room</button>
                     </form>
@@ -38,7 +42,7 @@
             <p id="roomnametxt"></p>
             <div id="chat-users" class="row">
                 <div class="col-md-3 chat-user local-user">
-                    <h4 id="localusername" class="card-title"></h4>
+                    <h4 id="localusername" class="modal-title"></h4>
                     <img class="img-thumbnail user-icon" src="https://placehold.jp/150x150.png">
                     <video id="myvideo" autoplay muted></video>
 
