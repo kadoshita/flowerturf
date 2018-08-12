@@ -8,6 +8,20 @@ body{
     margin-top: 20%;
     margin-bottom: 10%;
 }
+.chat-user{
+    height: 50%;
+    border: solid 2px white;
+    border-radius: 4px;
+}
+.user-icon{
+    width: 50%;
+    height: 50%;
+    border: solid 4px white;
+    border-radius: 50%;
+}
+.control-btn{
+    margin: 4px;
+}
 
 #chat{
     display: none;
