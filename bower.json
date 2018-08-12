@@ -1,0 +1,17 @@
+{
+  "name": "SkyWayMultiVoiceChat",
+  "homepage": "https://github.com/Kadoshita/SkyWayMultiVoiceChat",
+  "authors": [
+    "kadoshita <kadoshita.inct@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
