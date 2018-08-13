@@ -3,4 +3,6 @@ bower_components
 .bower-registry
 .bower-tmp
 
+.DS_Store
+
 js/apikey.json

@@ -23,12 +23,12 @@ $(document).ready(()=>{
             if($('#localusericon').get(0).width>256||$('#localusericon').get(0).height>256){
                 console.error('icon size error');
                 userdata.usericon=null;
-                $('#localusericon').attr('src','https://placehold.jp/150x150.png');
+                $('#localusericon').attr('src','./img/usericon.png');
             }
             if($('#localusericon').get(0).width!==$('#localusericon').get(0).height){
                 console.error('icon size error');
                 userdata.usericon=null;
-                $('#localusericon').attr('src','https://placehold.jp/150x150.png');
+                $('#localusericon').attr('src','./img/usericon.png');
             }
         });
     });
@@ -98,12 +98,14 @@ $(document).ready(()=>{
                     usericon:msg.data.usericon
                 };
                 $(`#${msg.src}-name`).text(msg.data.username);
-                setTimeout(()=>{
-                    const dataView = new Uint8Array(msg.data.usericon);
-                    const dataBlob = new Blob([dataView]);
-                    const url = URL.createObjectURL(dataBlob);
-                    $(`#${msg.src}-icon`).attr('src',url);
-                },500);
+                if(msg.data.usericon){
+                    setTimeout(()=>{
+                        const dataView = new Uint8Array(msg.data.usericon);
+                        const dataBlob = new Blob([dataView]);
+                        const url = URL.createObjectURL(dataBlob);
+                        $(`#${msg.src}-icon`).attr('src',url);
+                    },500);
+                }
             }
         });
         _room.on('peerJoin',id=>{
@@ -120,7 +122,7 @@ $(document).ready(()=>{
         let _elm=`
         <div id="${id}" class="col-md-3 chat-user active-user">
             <h4 id="${id}-name" class="modal-title">${(usersdata[id]?usersdata[id].username:id)}</h4>
-            <img id="${id}-icon" class="img-thumbnail user-icon" src="https://placehold.jp/150x150.png">
+            <img id="${id}-icon" class="img-thumbnail user-icon" src="./img/usericon.png">
             <video id="${id}-video" autoplay></video>
 
             <div class="text-center control-btn">
