@@ -12,6 +12,10 @@
 
 <body>
     <div class="container-fluid">
+        <div id="skyway-status" class="text-right">
+            <div id="status-icon" class="status-icon-offline"></div>
+            <div class="status-txt"><p id="skyway-statustxt">SkyWay Status : offline</p></div>
+        </div>
         <div id="joinroom">
             <div class="row title">
                 <div class="col-md-2"></div>
@@ -45,10 +49,10 @@
             </div>
         </div>
         <div id="chat">
-            <p id="roomnametxt"></p>
+            <h2 id="roomnametxt"></h2>
             <div id="chat-users" class="row">
                 <div class="col-md-3 chat-user local-user">
-                    <h4 id="localusername" class="modal-title"></h4>
+                    <p id="localusername" class="modal-title"></p>
                     <img id="localusericon" class="img-thumbnail user-icon" src="./img/usericon.png">
                     <video id="myvideo" autoplay muted></video>
 

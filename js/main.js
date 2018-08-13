@@ -14,6 +14,16 @@ $(document).ready(()=>{
             key:data.key,
             debug:3
         });
+        peer.on('open',id=>{
+            $('#status-icon').removeClass('status-icon-offline');
+            $('#status-icon').addClass('status-icon-online');
+            $('#skyway-statustxt').text('SkyWay Status : online');
+        });
+        peer.on('disconnected',()=>{
+            $('#status-icon').addClass('status-icon-offline');
+            $('#status-icon').removeClass('status-icon-online');
+            $('#skyway-statustxt').text('SkyWay Status : offline');
+        })
     });
     $('#usericonpit').on('change',e=>{
         let file=e.target.files[0];
@@ -39,7 +49,7 @@ $(document).ready(()=>{
         usersdata[peer.id]=userdata;
         $('#localusername').text(username?username:peer.id);
         if(roomname){
-            $('#roomnametxt').text(roomname);
+            $('#roomnametxt').text(`Room : ${roomname}`);
             $('#joinroom').toggle();
             $('#chat').toggle();
 

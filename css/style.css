@@ -11,6 +11,15 @@ video{
     margin-top: 10%;
     margin-bottom: 10%;
 }
+.status-icon-offline{
+    background-color: #c00f0f;
+}
+.status-icon-online{
+    background-color: #00ce00;
+}
+.status-txt{
+    display: inline-block;
+}
 .chat-user{
     height: 50%;
     border: solid 2px white;
@@ -35,6 +44,25 @@ video{
     margin: 4px;
 }
 
+#status-icon{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    animation: blink 2s infinite;
+}
 #chat{
     display: none;
+}
+
+@keyframes blink {
+    0%{
+        opacity: 0;
+    }
+    50%{
+        opacity: 1;
+    }
+    100%{
+        opacity: 0;
+    }
 }
