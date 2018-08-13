@@ -4,7 +4,8 @@ $(document).ready(()=>{
     let localStream=null;
     let remoteStreams={};
     let userdata={
-        username:''
+        username:'',
+        usericon:null
     };
     let usersdata={};
 
@@ -12,6 +13,23 @@ $(document).ready(()=>{
         peer=new Peer({
             key:data.key,
             debug:3
+        });
+    });
+    $('#usericonpit').on('change',e=>{
+        let file=e.target.files[0];
+        userdata.usericon=file;
+        $('#localusericon').attr('src',URL.createObjectURL(file));
+        $('#localusericon').on('load',()=>{
+            if($('#localusericon').get(0).width>256||$('#localusericon').get(0).height>256){
+                console.error('icon size error');
+                userdata.usericon=null;
+                $('#localusericon').attr('src','https://placehold.jp/150x150.png');
+            }
+            if($('#localusericon').get(0).width!==$('#localusericon').get(0).height){
+                console.error('icon size error');
+                userdata.usericon=null;
+                $('#localusericon').attr('src','https://placehold.jp/150x150.png');
+            }
         });
     });
     $('#joinroombtn').on('click',()=>{
@@ -67,6 +85,7 @@ $(document).ready(()=>{
         _room.on('stream',stream=>{
             console.log(stream);
             addChatUserElm(stream.peerId);
+            _room.send(userdata);
             remoteStreams[stream.peerId]=stream;
             $(`#${stream.peerId}-video`).get(0).srcObject=stream;
             $(`#${stream.peerId}-video`).get(0).play();
@@ -75,14 +94,20 @@ $(document).ready(()=>{
             console.log(msg);
             if(msg.data.username){
                 usersdata[msg.src]={
-                    username:msg.data.username
+                    username:msg.data.username,
+                    usericon:msg.data.usericon
                 };
                 $(`#${msg.src}-name`).text(msg.data.username);
+                setTimeout(()=>{
+                    const dataView = new Uint8Array(msg.data.usericon);
+                    const dataBlob = new Blob([dataView]);
+                    const url = URL.createObjectURL(dataBlob);
+                    $(`#${msg.src}-icon`).attr('src',url);
+                },500);
             }
         });
         _room.on('peerJoin',id=>{
             console.log(id);
-            _room.send(userdata);
         });
         _room.on('peerLeave',id=>{
             console.log(id);
@@ -95,7 +120,7 @@ $(document).ready(()=>{
         let _elm=`
         <div id="${id}" class="col-md-3 chat-user active-user">
             <h4 id="${id}-name" class="modal-title">${(usersdata[id]?usersdata[id].username:id)}</h4>
-            <img class="img-thumbnail user-icon" src="https://placehold.jp/150x150.png">
+            <img id="${id}-icon" class="img-thumbnail user-icon" src="https://placehold.jp/150x150.png">
             <video id="${id}-video" autoplay></video>
 
             <div class="text-center control-btn">
