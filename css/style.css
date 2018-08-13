@@ -54,6 +54,12 @@ video{
 #chat{
     display: none;
 }
+#myscreen{
+    display: block;
+    width: 100%;
+    height: auto;
+    background-color:#bbbbbb;
+}
 
 @keyframes blink {
     0%{

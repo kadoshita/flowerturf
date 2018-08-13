@@ -1,0 +1,27 @@
+{
+  "name": "SkyWay Multi Voice Chat Screenshare Extention",
+  "short_name": "SMVC Screenshare Extention",
+  "version": "0.1",
+  "manifest_version": 2,
+  "description": "Screenshare Extention for SkyWay Multi Voice Chat(SMVC)",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "permissions": [
+    "desktopCapture",
+    "tabs",
+    "https://*.ngrok.io/*"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "content_scripts": [{
+    "matches": ["https://*.ngrok.io/"],
+    "js": ["content.js"],
+    "all_frames": true,
+    "run_at": "document_end"
+  }]
+}

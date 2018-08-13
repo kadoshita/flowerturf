@@ -1,7 +1,10 @@
 $(document).ready(()=>{
+    const ss=ScreenShare.create({debug:true});
+
     let peer=null;
     let room=null;
     let localStream=null;
+    let localScreenStream=null;
     let remoteStreams={};
     let userdata={
         username:'',
@@ -86,6 +89,8 @@ $(document).ready(()=>{
         room=null;
         localStream.getTracks().forEach(track => track.stop());
         localStream=null;
+        ss.stop();
+        localScreenStream=null;
         userdata={};
         usersdata={};
         $('#myvideo').get(0).srcObject=null;
@@ -102,6 +107,20 @@ $(document).ready(()=>{
             $('#local-mutebtn').text('Mute');
         }
     });
+    $('#screensharebtn').on('click',()=>{
+        if(!localScreenStream){
+            ss.start().then(stream=>{
+                $('#myscreen').get(0).srcObject=stream;
+                localScreenStream=stream;
+            });
+            $('#screensharebtn').text('Screen Share Stop');
+        }else{
+            ss.stop();
+            $('#myscreen').get(0).srcObject=null;
+            localScreenStream=null;
+            $('#screensharebtn').text('Screen Share Start');
+        }
+    })
 
     let connect=_room=>{
         _room.on('open',()=>{
