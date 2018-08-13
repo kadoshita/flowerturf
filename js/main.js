@@ -9,6 +9,8 @@ $(document).ready(()=>{
     };
     let usersdata={};
 
+    $('#usernameipt').val(localStorage.getItem('username'));
+
     $.getJSON('/js/apikey.json',(data)=>{
         peer=new Peer({
             key:data.key,
@@ -53,6 +55,7 @@ $(document).ready(()=>{
     $('#joinroombtn').on('click',()=>{
         let roomname=$('#roomnameipt').val();
         let username=$('#usernameipt').val();
+        localStorage.setItem('username',username);
         userdata.username=username;
         usersdata[peer.id]=userdata;
         $('#localusername').text(username?username:peer.id);
