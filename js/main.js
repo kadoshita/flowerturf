@@ -31,12 +31,20 @@ $(document).ready(()=>{
         $('#localusericon').attr('src',URL.createObjectURL(file));
         $('#localusericon').on('load',()=>{
             if($('#localusericon').get(0).width>256||$('#localusericon').get(0).height>256){
-                console.error('icon size error');
+                swal({
+                    title: 'Icon Size Error!',
+                    text: 'Please use images of 256px or less in height and width.',
+                    icon: 'error',
+                });
                 userdata.usericon=null;
                 $('#localusericon').attr('src','./img/usericon.png');
             }
             if($('#localusericon').get(0).width!==$('#localusericon').get(0).height){
-                console.error('icon size error');
+                swal({
+                    title: 'Icon Size Error!',
+                    text: 'Please use square image',
+                    icon: 'error',
+                });
                 userdata.usericon=null;
                 $('#localusericon').attr('src','./img/usericon.png');
             }
@@ -62,7 +70,11 @@ $(document).ready(()=>{
                 connect(room);
             })
             .catch(e=>{
-                console.error(e);
+                swal({
+                    title: 'getUserMedia Error!',
+                    text: 'Please check your microphone.',
+                    icon: 'error',
+                });
             });
         }
     });
