@@ -136,9 +136,13 @@ $(document).ready(()=>{
             if($(`#${id}-mutebtn`).text()==='Mute'){
                 remoteStreams[id].getTracks().forEach(track=>track.enabled=false);
                 $(`#${id}-mutebtn`).text('Unmute');
+                $(`#${id}`).removeClass('active-user');
+                $(`#${id}`).addClass('mute-user');
             }else{
                 remoteStreams[id].getTracks().forEach(track=>track.enabled=true);
                 $(`#${id}-mutebtn`).text('Mute');
+                $(`#${id}`).removeClass('mute-user');
+                $(`#${id}`).addClass('active-user');
             }
         })
     };

@@ -22,6 +22,9 @@ video{
 .active-user{
     border-color: #00ce00;
 }
+.mute-user{
+    border-color: #fafafa;
+}
 .user-icon{
     width: 50%;
     height: 50%;
