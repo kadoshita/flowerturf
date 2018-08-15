@@ -2,15 +2,19 @@ $(document).ready(()=>{
     const ss=ScreenShare.create({debug:true});
 
     let peer=null;
+    let screensharepeer=null;
     let room=null;
+    let screenshareroom=null;
     let localStream=null;
     let localScreenStream=null;
+    let screensharinguserid='';
     let remoteStreams={};
     let userdata={
         username:'',
         usericon:null
     };
     let usersdata={};
+    let roomname='';
 
     $('#usernameipt').val(localStorage.getItem('username'));
 
@@ -28,7 +32,12 @@ $(document).ready(()=>{
             $('#status-icon').addClass('status-icon-offline');
             $('#status-icon').removeClass('status-icon-online');
             $('#skyway-statustxt').text('SkyWay Status : offline');
-        })
+        });
+
+        screensharepeer=new Peer({
+            key:data.key,
+            debug:3
+        });
     });
     $('#usericonpit').on('change',e=>{
         let file=e.target.files[0];
@@ -56,7 +65,7 @@ $(document).ready(()=>{
         });
     });
     $('#joinroombtn').on('click',()=>{
-        let roomname=$('#roomnameipt').val();
+        roomname=$('#roomnameipt').val();
         let username=$('#usernameipt').val();
         localStorage.setItem('username',username);
         userdata.username=username;
@@ -73,12 +82,12 @@ $(document).ready(()=>{
                 $('#myvideo').get(0).srcObject=stream;
                 room=peer.joinRoom(roomname,{mode:'sfu',stream:stream});
                 userdata.username=username;
-                connect(room);
+                connect(room,true);
             })
             .catch(e=>{
                 swal({
                     title: 'getUserMedia Error!',
-                    text: 'Please check your microphone.',
+                    text: `Please check your microphone.\n${e.toString()}`,
                     icon: 'error',
                 });
             });
@@ -112,43 +121,65 @@ $(document).ready(()=>{
             ss.start().then(stream=>{
                 $('#myscreen').get(0).srcObject=stream;
                 localScreenStream=stream;
+                screenshareroom=screensharepeer.joinRoom(roomname,{mode:'sfu',stream:stream});
+                connect(screenshareroom,false);
             });
             $('#screensharebtn').text('Screen Share Stop');
         }else{
             ss.stop();
+            screenshareroom.close();
+            screenshareroom=null;
+            localScreenStream.getTracks().forEach(track=>{
+                track.stop();
+            });
             $('#myscreen').get(0).srcObject=null;
             localScreenStream=null;
-            $('#screensharebtn').text('Screen Share Start');
+            $('#screensharebtn').text('Screen Share Start').toggle();
         }
-    })
+    });
 
-    let connect=_room=>{
+    let connect=(_room,isUser)=>{
         _room.on('open',()=>{
-            _room.send(userdata);
+            if(isUser){
+                _room.send(userdata);
+            }
         });
         _room.on('stream',stream=>{
+            if(stream.getAudioTracks()[0]&&isUser){
+                addChatUserElm(stream.peerId);
+                _room.send(userdata);
+                remoteStreams[stream.peerId]=stream;
+                $(`#${stream.peerId}-video`).get(0).srcObject=stream;
+                $(`#${stream.peerId}-video`).get(0).play();
+            }else{
+                screensharinguserid=stream.peerId;
+                $('#myscreen').get(0).srcObject=stream;
+                $('#myscreen').get(0).play();
+                if(!localScreenStream){
+                    $('#screensharebtn').toggle();
+                }
+            }
+        });
+        _room.on('removeStream', stream => {
             console.log(stream);
-            addChatUserElm(stream.peerId);
-            _room.send(userdata);
-            remoteStreams[stream.peerId]=stream;
-            $(`#${stream.peerId}-video`).get(0).srcObject=stream;
-            $(`#${stream.peerId}-video`).get(0).play();
-        })
+        });
         _room.on('data',msg=>{
-            console.log(msg);
-            if(msg.data.username){
-                usersdata[msg.src]={
-                    username:msg.data.username,
-                    usericon:msg.data.usericon
-                };
-                $(`#${msg.src}-name`).text(msg.data.username);
-                if(msg.data.usericon){
-                    setTimeout(()=>{
-                        const dataView = new Uint8Array(msg.data.usericon);
-                        const dataBlob = new Blob([dataView]);
-                        const url = URL.createObjectURL(dataBlob);
-                        $(`#${msg.src}-icon`).attr('src',url);
-                    },500);
+            if(isUser){
+                console.log(msg);
+                if(msg.data.username){
+                    usersdata[msg.src]={
+                        username:msg.data.username,
+                        usericon:msg.data.usericon
+                    };
+                    $(`#${msg.src}-name`).text(msg.data.username);
+                    if(msg.data.usericon){
+                        setTimeout(()=>{
+                            const dataView = new Uint8Array(msg.data.usericon);
+                            const dataBlob = new Blob([dataView]);
+                            const url = URL.createObjectURL(dataBlob);
+                            $(`#${msg.src}-icon`).attr('src',url);
+                        },500);
+                    }
                 }
             }
         });
@@ -157,15 +188,22 @@ $(document).ready(()=>{
         });
         _room.on('peerLeave',id=>{
             console.log(id);
-            remoteStreams[id]=null;
-            usersdata[id]=null;
-            removeChatUserElm(id);
+            if(isUser){
+                remoteStreams[id]=null;
+                usersdata[id]=null;
+                removeChatUserElm(id);
+            }
+            if(id===screensharinguserid){
+                $('#myscreen').get(0).srcObject=null;
+                $('#screensharebtn').toggle();
+                screensharinguserid='';
+            }
         });
     };
     let addChatUserElm=(id)=>{
         let _elm=`
         <div id="${id}" class="col-md-3 chat-user active-user">
-            <h4 id="${id}-name" class="modal-title">${(usersdata[id]?usersdata[id].username:id)}</h4>
+            <p id="${id}-name" class="modal-title">${(usersdata[id]?usersdata[id].username:id)}</p>
             <img id="${id}-icon" class="img-thumbnail user-icon" src="./img/usericon.png">
             <video id="${id}-video" autoplay></video>
 
