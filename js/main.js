@@ -153,9 +153,9 @@ $(document).ready(()=>{
                 $(`#${stream.peerId}-video`).get(0).play();
             }else{
                 screensharinguserid=stream.peerId;
-                $('#myscreen').get(0).srcObject=stream;
-                $('#myscreen').get(0).play();
                 if(!localScreenStream){
+                    $('#myscreen').get(0).srcObject=stream;
+                    $('#myscreen').get(0).play();
                     $('#screensharebtn').toggle();
                 }
             }
