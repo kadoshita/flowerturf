@@ -43,6 +43,21 @@ video{
 .control-btn{
     margin: 4px;
 }
+.chatmessage{
+    border-bottom: solid 2px #fafaff;
+}
+.chatmessageusericon{
+    width: 24px;
+    border-radius: 12px;
+}
+.chatmessageuser{
+    font-size: 8px;
+    margin: 0px;
+}
+.chatmessagetime{
+    color: gray;
+    font-size: 6px;
+}
 
 #status-icon{
     display: inline-block;
@@ -57,8 +72,14 @@ video{
 #myscreen{
     display: block;
     width: 100%;
-    height: auto;
+    height: 240px;
     background-color:#bbbbbb;
+}
+#chatmessages{
+    height: 290px;
+    max-height: 290px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 @keyframes blink {

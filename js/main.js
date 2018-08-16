@@ -106,6 +106,7 @@ $(document).ready(()=>{
         removeChatUserElms();
         $('#joinroom').toggle();
         $('#chat').toggle();
+        $("#chatmessages").empty();
     });
     $('#local-mutebtn').on('click',()=>{
         if($('#local-mutebtn').text()==='Mute'){
@@ -135,6 +136,21 @@ $(document).ready(()=>{
             $('#myscreen').get(0).srcObject=null;
             localScreenStream=null;
             $('#screensharebtn').text('Screen Share Start').toggle();
+        }
+    });
+    $('#chatsendmessagebtn').on('click',()=>{
+        let sendmsg=$('#chatsendmessageipt').val();
+        room.send({chatmsg:sendmsg});
+        addChatMessageElm(sendmsg);
+        $('#chatsendmessageipt').val('').focus();
+    });
+    $('#chatsendmessageipt').on('keydown',e=>{
+        if(e.keyCode===13){
+            e.preventDefault();
+            let sendmsg=$('#chatsendmessageipt').val();
+            room.send({chatmsg:sendmsg});
+            addChatMessageElm(sendmsg);
+            $('#chatsendmessageipt').val('').focus();
         }
     });
 
@@ -181,6 +197,9 @@ $(document).ready(()=>{
                         },500);
                     }
                 }
+                if(msg.data.chatmsg){
+                    addChatMessageElm(msg.data.chatmsg);
+                }
             }
         });
         _room.on('peerJoin',id=>{
@@ -200,6 +219,7 @@ $(document).ready(()=>{
             }
         });
     };
+
     let addChatUserElm=(id)=>{
         let _elm=`
         <div id="${id}" class="col-md-3 chat-user active-user">
@@ -241,4 +261,29 @@ $(document).ready(()=>{
             }
         }
     };
+
+    let addChatMessageElm=(msg)=>{
+        let t=new Date();
+        let _elm=`
+        <div class="row chatmessage">
+            <div class="col-2">
+                <img class="img-thumbnail chatmessageusericon" src="./img/usericon.png">
+            </div>
+            <div class="col-10 text-left">
+                <p class="chatmessageuser">test user A <span class="chatmessagetime">${t.getHours()}:${t.getMinutes()}:${t.getSeconds()}</span></p>
+                <p>${escapeHtml(msg)}</p>
+            </div>
+        </div>`;
+
+        $('#chatmessages').append(_elm);
+        $('#chatmessages').get(0).scrollTop=$('#chatmessages').get(0).scrollHeight;
+    };
+    let escapeHtml=str=>{
+        str = str.replace(/&/g, '&amp;');
+        str = str.replace(/</g, '&lt;');
+        str = str.replace(/>/g, '&gt;');
+        str = str.replace(/"/g, '&quot;');
+        str = str.replace(/'/g, '&#39;');
+        return str;
+    }
 });
