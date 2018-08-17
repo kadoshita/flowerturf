@@ -141,7 +141,7 @@ $(document).ready(()=>{
     $('#chatsendmessagebtn').on('click',()=>{
         let sendmsg=$('#chatsendmessageipt').val();
         room.send({chatmsg:sendmsg});
-        addChatMessageElm(sendmsg);
+        addChatMessageElm(peer.id,sendmsg);
         $('#chatsendmessageipt').val('').focus();
     });
     $('#chatsendmessageipt').on('keydown',e=>{
@@ -149,7 +149,7 @@ $(document).ready(()=>{
             e.preventDefault();
             let sendmsg=$('#chatsendmessageipt').val();
             room.send({chatmsg:sendmsg});
-            addChatMessageElm(sendmsg);
+            addChatMessageElm(peer.id,sendmsg);
             $('#chatsendmessageipt').val('').focus();
         }
     });
@@ -198,7 +198,7 @@ $(document).ready(()=>{
                     }
                 }
                 if(msg.data.chatmsg){
-                    addChatMessageElm(msg.data.chatmsg);
+                    addChatMessageElm(msg.src,msg.data.chatmsg);
                 }
             }
         });
@@ -262,15 +262,26 @@ $(document).ready(()=>{
         }
     };
 
-    let addChatMessageElm=(msg)=>{
+    let addChatMessageElm=(id,msg)=>{
+        let _data=usersdata[id];
+        let _username='';
         let t=new Date();
+        if(_data){
+            if(_data.username){
+                _username=_data.username;
+            }else{
+                _username=id;
+            }
+        }else{
+            _username=id;
+        }
         let _elm=`
         <div class="row chatmessage">
             <div class="col-2">
                 <img class="img-thumbnail chatmessageusericon" src="./img/usericon.png">
             </div>
             <div class="col-10 text-left">
-                <p class="chatmessageuser">test user A <span class="chatmessagetime">${t.getHours()}:${t.getMinutes()}:${t.getSeconds()}</span></p>
+                <p class="chatmessageuser">${_username} <span class="chatmessagetime">${t.getHours()}:${t.getMinutes()}:${t.getSeconds()}</span></p>
                 <p>${escapeHtml(msg)}</p>
             </div>
         </div>`;
