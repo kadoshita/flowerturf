@@ -138,6 +138,24 @@ $(document).ready(()=>{
             $('#screensharebtn').text('Screen Share Start').toggle();
         }
     });
+    $('#fullscreen-icon').on('click',()=>{
+        let _videoelm=$('#myscreen').get(0);
+        if(_videoelm.requestFullscreen){
+            _videoelm.requestFullscreen();
+        }else if(_videoelm.mozRequestFullScreen){
+            _videoelm.mozRequestFullScreen();
+        }else if(_videoelm.webkitRequestFullScreen){
+            _videoelm.webkitRequestFullScreen();
+        }else if(_videoelm.msRequestFullscreen){
+            _videoelm.msRequestFullscreen();
+        }else{
+            swal({
+                title: 'FullScreen Error!',
+                text: `FullScreen is unavailable.`,
+                icon: 'error',
+            });
+        }
+    });
     $('#chatsendmessagebtn').on('click',()=>{
         let sendmsg=$('#chatsendmessageipt').val();
         room.send({chatmsg:sendmsg});

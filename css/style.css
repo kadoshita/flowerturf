@@ -75,6 +75,13 @@ video{
     height: 240px;
     background-color:#bbbbbb;
 }
+#fullscreen-icon > .material-icons{
+    font-size: 32px;
+    color: white;
+}
+#fullscreen-icon > .material-icons:hover{
+    font-size: 36px;
+}
 #chatmessages{
     height: 290px;
     max-height: 290px;
