@@ -293,10 +293,18 @@ $(document).ready(()=>{
         }else{
             _username=id;
         }
+        let _usericon;
+        if(usersdata[id].usericon){
+            const dataView = new Uint8Array(usersdata[id].usericon);
+            const dataBlob = new Blob([dataView]);
+            _usericon=URL.createObjectURL(dataBlob);
+        }else{
+            _usericon='./img/usericon.png';
+        }
         let _elm=`
         <div class="row chatmessage">
             <div class="col-2">
-                <img class="img-thumbnail chatmessageusericon" src="./img/usericon.png">
+                <img class="img-thumbnail chatmessageusericon" src="${_usericon}">
             </div>
             <div class="col-10 text-left">
                 <p class="chatmessageuser">${_username} <span class="chatmessagetime">${t.getHours()}:${t.getMinutes()}:${t.getSeconds()}</span></p>
