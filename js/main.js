@@ -100,6 +100,9 @@ $(document).ready(()=>{
         localStream=null;
         ss.stop();
         localScreenStream=null;
+        if(screensharinguserid){
+            $('#screensharebtn').toggle();
+        }
         userdata={};
         usersdata={};
         $('#myvideo').get(0).srcObject=null;
@@ -179,18 +182,20 @@ $(document).ready(()=>{
             }
         });
         _room.on('stream',stream=>{
-            if(stream.getAudioTracks()[0]&&isUser){
-                addChatUserElm(stream.peerId);
-                _room.send(userdata);
-                remoteStreams[stream.peerId]=stream;
-                $(`#${stream.peerId}-video`).get(0).srcObject=stream;
-                $(`#${stream.peerId}-video`).get(0).play();
-            }else{
-                screensharinguserid=stream.peerId;
-                if(!localScreenStream){
-                    $('#myscreen').get(0).srcObject=stream;
-                    $('#myscreen').get(0).play();
-                    $('#screensharebtn').toggle();
+            if(isUser){
+                if(stream.getAudioTracks()[0]){
+                    addChatUserElm(stream.peerId);
+                    _room.send(userdata);
+                    remoteStreams[stream.peerId]=stream;
+                    $(`#${stream.peerId}-video`).get(0).srcObject=stream;
+                    $(`#${stream.peerId}-video`).get(0).play();
+                }else{
+                    screensharinguserid=stream.peerId;
+                    if(!localScreenStream){
+                        $('#myscreen').get(0).srcObject=stream;
+                        $('#myscreen').get(0).play();
+                        $('#screensharebtn').toggle();
+                    }
                 }
             }
         });
