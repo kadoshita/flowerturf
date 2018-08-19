@@ -19,6 +19,8 @@ $(document).ready(()=>{
 
     $('#usernameipt').val(localStorage.getItem('username'));
 
+    roomname=location.search.split('?')[1].split('=')[1];
+    $('#roomnameipt').val(roomname);
     let audiodevicesselect=$('#audioinputselect');
     navigator.mediaDevices.enumerateDevices().then(devices=>{
         devices.forEach(device=>{
@@ -82,6 +84,7 @@ $(document).ready(()=>{
     $('#joinroombtn').on('click',()=>{
         audioInputDeviceId=audiodevicesselect.val();
         roomname=$('#roomnameipt').val();
+        history.replaceState('','','?room='+roomname);
         let username=$('#usernameipt').val();
         localStorage.setItem('username',username);
         userdata.username=username;
