@@ -15,8 +15,23 @@ $(document).ready(()=>{
     };
     let usersdata={};
     let roomname='';
+    let audioInputDeviceId='';
 
     $('#usernameipt').val(localStorage.getItem('username'));
+
+    let audiodevicesselect=$('#audioinputselect');
+    navigator.mediaDevices.enumerateDevices().then(devices=>{
+        devices.forEach(device=>{
+            console.log(device);
+            if(device.kind==='audioinput'){
+                if(device.label){
+                    audiodevicesselect.append(`<option value="${device.deviceId}">${device.label}</option>`);
+                }else{
+                    audiodevicesselect.append(`<option value="${device.deviceId}">${device.kind}</option>`);
+                }
+            }
+        });
+    });
 
     $.getJSON('/js/apikey.json',(data)=>{
         peer=new Peer({
@@ -65,6 +80,7 @@ $(document).ready(()=>{
         });
     });
     $('#joinroombtn').on('click',()=>{
+        audioInputDeviceId=audiodevicesselect.val();
         roomname=$('#roomnameipt').val();
         let username=$('#usernameipt').val();
         localStorage.setItem('username',username);
@@ -76,7 +92,7 @@ $(document).ready(()=>{
             $('#joinroom').toggle();
             $('#chat').toggle();
 
-            navigator.mediaDevices.getUserMedia({video:false,audio:true})
+            navigator.mediaDevices.getUserMedia({video:false,audio:{deviceId:audioInputDeviceId}})
             .then(stream=>{
                 localStream=stream;
                 $('#myvideo').get(0).srcObject=stream;
