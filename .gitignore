@@ -6,6 +6,8 @@
 
 .DS_Store
 
+*.zip
+
 js/apikey.json
 
 !bower_components/bootstrap/dist/
