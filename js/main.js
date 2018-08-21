@@ -326,7 +326,11 @@ $(document).ready(()=>{
             _username=id;
         }
         let _usericon;
-        if(usersdata[id].usericon){
+        if(!usersdata[id]){
+            _usericon='./img/usericon.png';
+        }else if(!usersdata[id].usericon){
+            _usericon='./img/usericon.png';
+        }else{
             const dataView = new Uint8Array(usersdata[id].usericon);
             const dataBlob = new Blob([dataView]);
             _usericon=URL.createObjectURL(dataBlob);
