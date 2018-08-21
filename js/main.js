@@ -19,7 +19,15 @@ $(document).ready(()=>{
 
     $('#usernameipt').val(localStorage.getItem('username'));
 
-    roomname=location.search.split('?')[1].split('=')[1];
+    let search=location.search;
+    if(search.indexOf('?')!==-1){
+        let tmp=search.split('?')[1];
+        if(tmp.indexOf('room')!==-1){
+            if(tmp.split('=')[0]==='room'){
+                roomname=tmp.split('=')[1];
+            }
+        }
+    }
     $('#roomnameipt').val(roomname);
     let audiodevicesselect=$('#audioinputselect');
     navigator.mediaDevices.enumerateDevices().then(devices=>{
