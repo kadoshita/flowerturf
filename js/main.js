@@ -90,6 +90,7 @@ $(document).ready(()=>{
         });
     });
     $('#joinroombtn').on('click',()=>{
+        gtag('event', 'joinroom');
         audioInputDeviceId=audiodevicesselect.val();
         roomname=$('#roomnameipt').val();
         history.replaceState('','','?room='+roomname);
@@ -133,6 +134,48 @@ $(document).ready(()=>{
         userdata={};
         usersdata={};
         $('#myvideo').get(0).srcObject=null;
+        let good=document.createElement('a');
+        let goodicon=document.createElement('i');
+        goodicon.className='material-icons ratingicons';
+        goodicon.textContent='thumb_up';
+        good.appendChild(goodicon);
+        good.href='#';
+        good.onclick=()=>{
+            gtag('event','good',{'event_category':'rating'});
+            swal.close();
+        };
+        let bad=document.createElement('a');
+        let badicon=document.createElement('i');
+        badicon.className='material-icons ratingicons';
+        badicon.textContent='thumb_down';
+        bad.appendChild(badicon);
+        bad.href='#';
+        bad.onclick=()=>{
+            gtag('event','bad',{'event_category':'rating'});
+            swal.close();
+            let formurl='https://docs.google.com/forms/d/e/1FAIpQLSdic9ACUKFxZC3KZa2DWmgzOly3mJ17u7qUaMJnTM69g25W_w/formResponse';
+            
+            swal('気になった点があればご記入ください',{content: 'input'}).then(value=>{
+                $.ajax({
+                    url: formurl,
+                    data: {'entry.1118083239': value},
+                    type: 'POST',
+                    dataType: 'xml',
+                    statusCode: {
+                        0: ()=>{
+                            swal('フィードバックを送信しました。ご協力ありがとうございました。');
+                        },
+                        200: ()=>{
+                            swal('フィードバックを送信しました。ご協力ありがとうございました。');
+                        }
+                    }
+                });
+            });
+        };
+        let goodbad=document.createElement('div');
+        goodbad.appendChild(good);
+        goodbad.appendChild(bad);
+        swal('SkyWay Multi Voice Chatの使い心地はいかがでしたか?',{button:false,content:goodbad});
         removeChatUserElms();
         $('#joinroom').toggle();
         $('#chat').toggle();
@@ -149,6 +192,7 @@ $(document).ready(()=>{
     });
     $('#screensharebtn').on('click',()=>{
         if(!localScreenStream){
+            gtag('event', 'screenshare');
             ss.start().then(stream=>{
                 $('#myscreen').get(0).srcObject=stream;
                 localScreenStream=stream;
@@ -187,12 +231,14 @@ $(document).ready(()=>{
         }
     });
     $('#chatsendmessagebtn').on('click',()=>{
+        gtag('event', 'chat');
         let sendmsg=$('#chatsendmessageipt').val();
         room.send({chatmsg:sendmsg});
         addChatMessageElm(peer.id,sendmsg);
         $('#chatsendmessageipt').val('').focus();
     });
     $('#chatsendmessageipt').on('keydown',e=>{
+        gtag('event', 'chat');
         if(e.keyCode===13){
             e.preventDefault();
             let sendmsg=$('#chatsendmessageipt').val();
@@ -334,8 +380,6 @@ $(document).ready(()=>{
             const dataView = new Uint8Array(usersdata[id].usericon);
             const dataBlob = new Blob([dataView]);
             _usericon=URL.createObjectURL(dataBlob);
-        }else{
-            _usericon='./img/usericon.png';
         }
         let _elm=`
         <div class="row chatmessage">

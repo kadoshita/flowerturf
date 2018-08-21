@@ -58,6 +58,10 @@ video{
     color: gray;
     font-size: 6px;
 }
+.ratingicons{
+    margin-right: 16px;
+    margin-left: 16px;
+}
 
 #status-icon{
     display: inline-block;
