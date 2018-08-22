@@ -90,7 +90,11 @@ $(document).ready(()=>{
             }
         });
     });
-    $('#joinroombtn').on('click',()=>{
+    $('#joinroombtn').on('click', () => {
+        if (!$('#termscheck').prop('checked')) {
+            swal({title:'本サービスを利用する際は、利用規約とプライバシーポリシーに同意する必要があります。',icon:'info'});
+            return;
+        }
         gtag('event', 'joinroom');
         audioInputDeviceId=audiodevicesselect.val();
         roomname=$('#roomnameipt').val();
