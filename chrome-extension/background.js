@@ -1,7 +1,7 @@
 // background script
 
 // change hostname of your own.
-const config = {hostname: 'test.example.com'};
+const config = {hostname: 'sublimer.me'};
 
 // Execute screen share feature when requested from content.js (content script)
 chrome.runtime.onConnect.addListener(port => {

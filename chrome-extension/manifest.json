@@ -1,7 +1,7 @@
 {
   "name": "SkyWay Multi Voice Chat Screenshare Extention",
   "short_name": "SMVC Screenshare Extention",
-  "version": "0.1",
+  "version": "0.1.1",
   "manifest_version": 2,
   "description": "Screenshare Extention for SkyWay Multi Voice Chat(SMVC)",
   "icons": {
