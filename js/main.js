@@ -16,6 +16,7 @@ $(document).ready(()=>{
     let usersdata={};
     let roomname='';
     let audioInputDeviceId='';
+    let isChrome=(navigator.userAgent.toLowerCase().indexOf('chrome')!==-1?true:false);
 
     $('#usernameipt').val(localStorage.getItem('username'));
 
@@ -192,14 +193,33 @@ $(document).ready(()=>{
     });
     $('#screensharebtn').on('click',()=>{
         if(!localScreenStream){
-            gtag('event', 'screenshare');
-            ss.start().then(stream=>{
-                $('#myscreen').get(0).srcObject=stream;
-                localScreenStream=stream;
-                screenshareroom=screensharepeer.joinRoom(roomname,{mode:'sfu',stream:stream});
-                connect(screenshareroom,false);
-            });
-            $('#screensharebtn').text('Screen Share Stop');
+            if(ss.isScreenShareAvailable()){
+                gtag('event', 'screenshare');
+                ss.start().then(stream=>{
+                    $('#myscreen').get(0).srcObject=stream;
+                    localScreenStream=stream;
+                    screenshareroom=screensharepeer.joinRoom(roomname,{mode:'sfu',stream:stream});
+                    connect(screenshareroom,false);
+                }).catch(err=>{
+                    swal({
+                        title: 'screen capture Error!',
+                        icon: 'error',
+                    });
+                });
+                $('#screensharebtn').text('Screen Share Stop');
+            }else{
+                if(isChrome){
+                    swal({
+                        title: '画面共有用拡張機能をインストールしてください。',
+                        text: 'OKをクリックするとインストールページを開きます。',
+                        icon: 'info',
+                    }).then(()=>{
+                        window.open('https://chrome.google.com/webstore/detail/skyway-multi-voice-chat-s/nakmojfkhggecppohmgocbaoafpgbkjg');
+                    });
+                }else{
+                    swal('最新のブラウザをインストールしてください。');
+                }
+            }
         }else{
             ss.stop();
             screenshareroom.close();
