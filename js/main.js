@@ -1,5 +1,5 @@
 $(document).ready(()=>{
-    const ss=ScreenShare.create({debug:true});
+    const ss=ScreenShare.create({debug:false});
 
     let peer=null;
     let screensharepeer=null;
@@ -33,7 +33,6 @@ $(document).ready(()=>{
     let audiodevicesselect=$('#audioinputselect');
     navigator.mediaDevices.enumerateDevices().then(devices=>{
         devices.forEach(device=>{
-            console.log(device);
             if(device.kind==='audioinput'){
                 if(device.label){
                     audiodevicesselect.append(`<option value="${device.deviceId}">${device.label}</option>`);
@@ -47,7 +46,7 @@ $(document).ready(()=>{
     $.getJSON('/js/apikey.json',(data)=>{
         peer=new Peer({
             key:data.key,
-            debug:3
+            debug:0
         });
         peer.on('open',id=>{
             $('#status-icon').removeClass('status-icon-offline');
@@ -62,7 +61,7 @@ $(document).ready(()=>{
 
         screensharepeer=new Peer({
             key:data.key,
-            debug:3
+            debug:0
         });
     });
     $('#usericonpit').on('change',e=>{
@@ -296,12 +295,8 @@ $(document).ready(()=>{
                 }
             }
         });
-        _room.on('removeStream', stream => {
-            console.log(stream);
-        });
         _room.on('data',msg=>{
             if(isUser){
-                console.log(msg);
                 if(msg.data.username){
                     usersdata[msg.src]={
                         username:msg.data.username,
@@ -322,11 +317,7 @@ $(document).ready(()=>{
                 }
             }
         });
-        _room.on('peerJoin',id=>{
-            console.log(id);
-        });
         _room.on('peerLeave',id=>{
-            console.log(id);
             if(isUser){
                 remoteStreams[id]=null;
                 usersdata[id]=null;
