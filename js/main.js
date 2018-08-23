@@ -43,7 +43,7 @@ $(document).ready(()=>{
         });
     });
 
-    $.getJSON('/js/apikey.json',(data)=>{
+    $.getJSON('./js/apikey.json',(data)=>{
         peer=new Peer({
             key:data.key,
             debug:0
