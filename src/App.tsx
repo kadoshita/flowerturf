@@ -10,7 +10,7 @@ const App = () => {
           <h1>SkyWay Multi VoiceChat</h1>
         </Grid>
         <Grid item xs={12}>
-          <TextField label="Room ID"></TextField>
+          <TextField label="Room ID" color="primary"></TextField>
         </Grid>
         <Grid item xs={12}>
           <Button variant="contained" color="primary">Enter Now!</Button>
