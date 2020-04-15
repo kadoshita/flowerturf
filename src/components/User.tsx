@@ -10,6 +10,11 @@ const User = (props: UserProps) => {
             <Grid item xs={12}>
                 <h1>{props.name}</h1>
             </Grid>
+            <Grid item xs={4}></Grid>
+            <Grid item xs={4}>
+                <img src='user.png' alt="user icon" style={{ width: '50%', height: 'auto' }}></img>
+            </Grid>
+            <Grid item xs={4}></Grid>
         </Grid>
     )
 };
