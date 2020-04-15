@@ -1,5 +1,6 @@
 import React from 'react';
 import { Grid, TextField, Button } from '@material-ui/core';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
     return (
@@ -11,7 +12,9 @@ const Home = () => {
                 <TextField label="Room ID" color="primary"></TextField>
             </Grid>
             <Grid item xs={12}>
-                <Button variant="contained" color="primary">Enter Now!</Button>
+                <Link to='/chat'>
+                    <Button variant="contained" color="primary">Enter Now!</Button>
+                </Link>
             </Grid>
         </Grid>
     )
