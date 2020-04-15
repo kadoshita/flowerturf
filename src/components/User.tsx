@@ -1,11 +1,14 @@
 import React from 'react';
 import { Grid } from '@material-ui/core';
 
-const User = () => {
+type UserProps = {
+    name: string
+};
+const User = (props: UserProps) => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <h1>User1</h1>
+                <h1>{props.name}</h1>
             </Grid>
         </Grid>
     )

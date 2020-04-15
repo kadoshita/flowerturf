@@ -9,7 +9,7 @@ const Chat = () => {
                 <h1>SkyWay Multi VoiceChat</h1>
             </Grid>
             <Grid item xs={2}>
-                <User></User>
+                <User name='user1'></User>
             </Grid>
         </Grid>
     )
