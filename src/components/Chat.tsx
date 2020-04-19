@@ -10,19 +10,21 @@ const Chat = () => {
     const peer = new Peer({
         key: apiKey
     });
+    const state = store.getState();
     peer.on('open', id => {
         console.log(`Conenction established between SkyWay Server!! My ID is ${id}`);
-        const meshRoom = peer.joinRoom(store.getState().roomname, {
+        const meshRoom = peer.joinRoom(state.roomname, {
             mode: 'mesh'
         });
         meshRoom.on('open', () => {
-            console.log(`Join room ${store.getState().roomname}`);
+            console.log(`Join room ${state.roomname}`);
         });
     });
     return (
         <Grid container>
             <Grid item xs={12}>
                 <h1>SkyWay Multi VoiceChat</h1>
+                <p>Room: {state.roomname}</p>
             </Grid>
             <Grid item xs={4}>
                 <User name="me"></User>
