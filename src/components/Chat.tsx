@@ -3,6 +3,8 @@ import { Grid } from '@material-ui/core';
 import Peer from 'skyway-js';
 import User from './User';
 
+import store from '../store/index';
+
 const Chat = () => {
     const apiKey = process.env.REACT_APP_SKYWAY_API_KEY || '';
     const peer = new Peer({
@@ -10,6 +12,12 @@ const Chat = () => {
     });
     peer.on('open', id => {
         console.log(`Conenction established between SkyWay Server!! My ID is ${id}`);
+        const meshRoom = peer.joinRoom(store.getState().roomname, {
+            mode: 'mesh'
+        });
+        meshRoom.on('open', () => {
+            console.log(`Join room ${store.getState().roomname}`);
+        });
     });
     return (
         <Grid container>
