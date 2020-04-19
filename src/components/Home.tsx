@@ -9,11 +9,11 @@ const Home = () => {
                 <h1>SkyWay Multi VoiceChat</h1>
             </Grid>
             <Grid item xs={12}>
-                <TextField label="Room ID" color="primary"></TextField>
+                <TextField label="Room ID" color="primary" style={{ width: '20%' }}></TextField>
             </Grid>
             <Grid item xs={12}>
                 <Link to='/chat'>
-                    <Button variant="contained" color="primary">Enter Now!</Button>
+                    <Button variant="contained" color="primary" style={{ marginTop: '4px' }}>Enter Now!</Button>
                 </Link>
             </Grid>
         </Grid>
