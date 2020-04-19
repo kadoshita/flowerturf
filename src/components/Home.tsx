@@ -12,6 +12,9 @@ const Home = () => {
                 <TextField label="Room ID" color="primary" style={{ width: '20%' }}></TextField>
             </Grid>
             <Grid item xs={12}>
+                <TextField label="User Name" color="primary" style={{ width: '20%' }}></TextField>
+            </Grid>
+            <Grid item xs={12}>
                 <Link to='/chat'>
                     <Button variant="contained" color="primary" style={{ marginTop: '4px' }}>Enter Now!</Button>
                 </Link>
