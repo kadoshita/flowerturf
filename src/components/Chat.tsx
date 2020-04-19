@@ -1,8 +1,16 @@
 import React from 'react';
 import { Grid } from '@material-ui/core';
+import Peer from 'skyway-js';
 import User from './User';
 
 const Chat = () => {
+    const apiKey = process.env.REACT_APP_SKYWAY_API_KEY || '';
+    const peer = new Peer({
+        key: apiKey
+    });
+    peer.on('open', id => {
+        console.log(`Conenction established between SkyWay Server!! My ID is ${id}`);
+    });
     return (
         <Grid container>
             <Grid item xs={12}>
