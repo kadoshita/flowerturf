@@ -8,7 +8,7 @@ const User = (props: UserProps) => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <h1>{props.name}</h1>
+                <p style={{ fontSize: '130%' }}>{props.name}</p>
             </Grid>
             <Grid item xs={4}></Grid>
             <Grid item xs={4}>
