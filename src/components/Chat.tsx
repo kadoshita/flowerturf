@@ -6,11 +6,14 @@ import User from './User';
 import store from '../store/index';
 
 const Chat = () => {
+    const state = store.getState();
+    if (state.roomname === '') {
+        window.location.href = window.location.origin;
+    }
     const apiKey = process.env.REACT_APP_SKYWAY_API_KEY || '';
     const peer = new Peer({
         key: apiKey
     });
-    const state = store.getState();
     peer.on('open', id => {
         console.log(`Conenction established between SkyWay Server!! My ID is ${id}`);
         const meshRoom = peer.joinRoom(state.roomname, {
