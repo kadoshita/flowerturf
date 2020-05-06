@@ -10,6 +10,7 @@ const Chat = () => {
     if (state.roomname === '') {
         window.location.href = window.location.origin;
     }
+    window.history.replaceState('', '', `${window.location.origin}/chat?room=${state.roomname}`);
     const apiKey = process.env.REACT_APP_SKYWAY_API_KEY || '';
     const peer = new Peer({
         key: apiKey
