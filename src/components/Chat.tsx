@@ -27,7 +27,16 @@ const Chat = () => {
                 <p>Room: {state.roomname}</p>
             </Grid>
             <Grid item xs={4}>
-                <User name="me"></User>
+                <Grid container>
+                    <Grid item xs={12}>
+                        <p style={{ fontSize: '130%' }}>{state.username}</p>
+                    </Grid>
+                    <Grid item xs={4}></Grid>
+                    <Grid item xs={4}>
+                        <img src='user.png' alt="user icon" style={{ width: '50%', height: 'auto' }}></img>
+                    </Grid>
+                    <Grid item xs={4}></Grid>
+                </Grid>
             </Grid>
             <Grid item xs={8}>
                 <Grid container>
