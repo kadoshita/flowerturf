@@ -14,10 +14,18 @@ const Chat = () => {
     const peer = new Peer({
         key: apiKey
     });
-    peer.on('open', id => {
+    peer.on('open', async id => {
         console.log(`Conenction established between SkyWay Server!! My ID is ${id}`);
+        const localAudioStream = await navigator.mediaDevices.getUserMedia({
+            video: false,
+            audio: {
+                sampleSize: 16,
+                echoCancellation: true
+            }
+        });
         const meshRoom = peer.joinRoom(state.roomname, {
-            mode: 'mesh'
+            mode: 'mesh',
+            stream: localAudioStream
         });
         meshRoom.on('open', () => {
             console.log(`Join room ${state.roomname}`);
