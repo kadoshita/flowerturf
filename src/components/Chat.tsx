@@ -1,16 +1,35 @@
 import React from 'react';
 import { Grid } from '@material-ui/core';
 import Peer from 'skyway-js';
+import { ROOM_NAME_STORE } from '../actions/index';
 import User from './User';
 
 import store from '../store/index';
 
+const parseQueryParameter = (query: string): { [key: string]: string } => {
+    let params: Array<string> = query.split('&');
+    let paramObject: { [key: string]: string } = {};
+    params.forEach(p => {
+        let key = p.split('=')[0];
+        let value = p.split('=')[1];
+        paramObject[key] = value;
+    });
+
+    return paramObject;
+}
+
 const Chat = () => {
     const state = store.getState();
-    if (state.roomname === '') {
+    const parameters = parseQueryParameter(window.location.search.replace('?', ''));
+    const roomName = (state.roomname === '') ? parameters.room : state.roomname;
+    if (roomName === '') {
         window.location.href = window.location.origin;
+    } else if (parameters.room === '') {
+        window.history.replaceState('', '', `${window.location.origin}/chat?room=${roomName}`);
+    } else {
+        store.dispatch({ type: ROOM_NAME_STORE, name: roomName });
     }
-    window.history.replaceState('', '', `${window.location.origin}/chat?room=${state.roomname}`);
+
     const apiKey = process.env.REACT_APP_SKYWAY_API_KEY || '';
     const peer = new Peer({
         key: apiKey
@@ -24,19 +43,19 @@ const Chat = () => {
                 echoCancellation: true
             }
         });
-        const meshRoom = peer.joinRoom(state.roomname, {
+        const meshRoom = peer.joinRoom(roomName, {
             mode: 'mesh',
             stream: localAudioStream
         });
         meshRoom.on('open', () => {
-            console.log(`Join room ${state.roomname}`);
+            console.log(`Join room ${roomName}`);
         });
     });
     return (
         <Grid container>
             <Grid item xs={12}>
                 <h1>SkyWay Multi VoiceChat</h1>
-                <p>Room: {state.roomname}</p>
+                <p>Room: {roomName}</p>
             </Grid>
             <Grid item xs={4}>
                 <Grid container>
