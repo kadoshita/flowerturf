@@ -24,7 +24,7 @@ const Chat = () => {
     const roomName = (state.roomname === '') ? parameters.room : state.roomname;
     if (roomName === '') {
         window.location.href = window.location.origin;
-    } else if (parameters.room === '') {
+    } else if (!Object.keys(parameters).includes('room')) {
         window.history.replaceState('', '', `${window.location.origin}/chat?room=${roomName}`);
     } else {
         store.dispatch({ type: ROOM_NAME_STORE, name: roomName });
