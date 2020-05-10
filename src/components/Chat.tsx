@@ -61,6 +61,10 @@ const Chat = () => {
                 setUsers(_users);
             });
         });
+
+        return () => {
+            peer.destroy();
+        };
     }, [roomName]);
     return (
         <Grid container>
