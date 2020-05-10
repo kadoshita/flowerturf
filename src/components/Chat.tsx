@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Grid } from '@material-ui/core';
 import Peer from 'skyway-js';
 import { ROOM_NAME_STORE } from '../actions/index';
@@ -20,6 +20,8 @@ const parseQueryParameter = (query: string): { [key: string]: string } => {
 
 const Chat = () => {
     const state = store.getState();
+    const [myId, setMyId] = useState('');
+    const [users, setUsers] = useState<string[]>([]);
     const parameters = parseQueryParameter(window.location.search.replace('?', ''));
     const roomName = (state.roomname === '') ? parameters.room : state.roomname;
     if (roomName === '') {
@@ -30,27 +32,36 @@ const Chat = () => {
         store.dispatch({ type: ROOM_NAME_STORE, name: roomName });
     }
 
-    const apiKey = process.env.REACT_APP_SKYWAY_API_KEY || '';
-    const peer = new Peer({
-        key: apiKey
-    });
-    peer.on('open', async id => {
-        console.log(`Conenction established between SkyWay Server!! My ID is ${id}`);
-        const localAudioStream = await navigator.mediaDevices.getUserMedia({
-            video: false,
-            audio: {
-                sampleSize: 16,
-                echoCancellation: true
-            }
+    useEffect(() => {
+        const apiKey = process.env.REACT_APP_SKYWAY_API_KEY || '';
+        const peer = new Peer({
+            key: apiKey
         });
-        const meshRoom = peer.joinRoom(roomName, {
-            mode: 'mesh',
-            stream: localAudioStream
+        peer.on('open', async id => {
+            console.log(`Conenction established between SkyWay Server!! My ID is ${id}`);
+            setMyId(id);
+            const localAudioStream = await navigator.mediaDevices.getUserMedia({
+                video: false,
+                audio: {
+                    sampleSize: 16,
+                    echoCancellation: true
+                }
+            });
+            const meshRoom = peer.joinRoom(roomName, {
+                mode: 'mesh',
+                stream: localAudioStream
+            });
+            meshRoom.on('open', () => {
+                console.log(`Join room ${roomName}`);
+            });
+            meshRoom.on('peerJoin', peerId => {
+                console.log(`User ${peerId} joined`);
+                const _users = [...users];
+                _users.push(peerId);
+                setUsers(_users);
+            });
         });
-        meshRoom.on('open', () => {
-            console.log(`Join room ${roomName}`);
-        });
-    });
+    }, [roomName]);
     return (
         <Grid container>
             <Grid item xs={12}>
@@ -60,7 +71,7 @@ const Chat = () => {
             <Grid item xs={4}>
                 <Grid container>
                     <Grid item xs={12}>
-                        <p style={{ fontSize: '130%' }}>{state.username}</p>
+                        <p style={{ fontSize: '130%' }}>{(state.username !== '') ? state.username : myId}</p>
                     </Grid>
                     <Grid item xs={4}></Grid>
                     <Grid item xs={4}>
@@ -71,7 +82,7 @@ const Chat = () => {
             </Grid>
             <Grid item xs={8}>
                 <Grid container>
-                    {['user1', 'user2', 'user3', 'user4', 'user5', 'user6', 'user7', 'user8', 'user9', 'user10', 'user11', 'user12'].map((u, i) => <Grid item xs={2} key={i}><User name={u}></User></Grid>)}
+                    {users.map((u, i) => <Grid item xs={2} key={i}><User name={u}></User></Grid>)}
                 </Grid>
             </Grid>
         </Grid>
