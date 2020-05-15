@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Grid } from '@material-ui/core';
-import Peer from 'skyway-js';
+import Peer, { RoomStream } from 'skyway-js';
 import { ROOM_NAME_STORE } from '../actions/index';
 import User from './User';
 
@@ -21,7 +21,7 @@ const parseQueryParameter = (query: string): { [key: string]: string } => {
 const Chat = () => {
     const state = store.getState();
     const [myId, setMyId] = useState('');
-    const [users, setUsers] = useState<string[]>([]);
+    const [userStreams, setUserStreams] = useState<RoomStream[]>([]);
     const parameters = parseQueryParameter(window.location.search.replace('?', ''));
     const roomName = (state.roomname === '') ? parameters.room : state.roomname;
     if (roomName === '') {
@@ -54,11 +54,12 @@ const Chat = () => {
             meshRoom.on('open', () => {
                 console.log(`Join room ${roomName}`);
             });
-            meshRoom.on('peerJoin', peerId => {
-                console.log(`User ${peerId} joined`);
-                const _users = [...users];
-                _users.push(peerId);
-                setUsers(_users);
+
+            meshRoom.on('stream', stream => {
+                console.log(`User ${stream.peerId} streaming start`);
+                const _userStreams = [...userStreams];
+                _userStreams.push(stream);
+                setUserStreams(_userStreams);
             });
         });
 
@@ -87,7 +88,7 @@ const Chat = () => {
             </Grid>
             <Grid item xs={8}>
                 <Grid container>
-                    {users.map((u, i) => <Grid item xs={2} key={i}><User name={u}></User></Grid>)}
+                    {userStreams.map((u, i) => <Grid item xs={2} key={i}><User stream={u}></User></Grid>)}
                 </Grid>
             </Grid>
         </Grid>
