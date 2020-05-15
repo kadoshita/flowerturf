@@ -65,6 +65,7 @@ const Chat = () => {
         return () => {
             peer.destroy();
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [roomName]);
     return (
         <Grid container>
