@@ -61,6 +61,13 @@ const Chat = () => {
                 _userStreams.push(stream);
                 setUserStreams(_userStreams);
             });
+            meshRoom.on('peerLeave', peerId => {
+                console.log(`User ${peerId} leave`);
+                const _userStreams = [...userStreams];
+                const leavePeerStreamIndex = _userStreams.findIndex(s => s.peerId === peerId);
+                _userStreams.splice(leavePeerStreamIndex, 1);
+                setUserStreams(_userStreams);
+            });
         });
 
         return () => {
