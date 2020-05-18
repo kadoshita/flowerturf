@@ -11,6 +11,7 @@ const DeviceSelect = () => {
         async function getMediaDeviceInfo() {
             const mediaDevices = await (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audioinput');
             setDevices(mediaDevices);
+            setInputDevice(mediaDevices[0].deviceId);
         }
         getMediaDeviceInfo();
     }, []);
