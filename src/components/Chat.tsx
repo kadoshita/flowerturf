@@ -5,6 +5,7 @@ import { ROOM_NAME_STORE } from '../actions/index';
 import User from './User';
 
 import store from '../store/index';
+import deviceStore from '../store/device';
 
 const parseQueryParameter = (query: string): { [key: string]: string } => {
     let params: Array<string> = query.split('&');
@@ -17,6 +18,21 @@ const parseQueryParameter = (query: string): { [key: string]: string } => {
 
     return paramObject;
 }
+const getMediaTrackConstraints = (): MediaTrackConstraints => {
+    const { deviceId } = deviceStore.getState().inputDevice;
+    if (deviceId !== '') {
+        return {
+            sampleSize: 16,
+            echoCancellation: true,
+            deviceId: deviceId
+        };
+    } else {
+        return {
+            sampleSize: 16,
+            echoCancellation: true
+        };
+    }
+};
 
 const Chat = () => {
     const state = store.getState();
@@ -40,12 +56,10 @@ const Chat = () => {
         peer.on('open', async id => {
             console.log(`Conenction established between SkyWay Server!! My ID is ${id}`);
             setMyId(id);
+            const audioTrackConstraints = getMediaTrackConstraints()
             const localAudioStream = await navigator.mediaDevices.getUserMedia({
                 video: false,
-                audio: {
-                    sampleSize: 16,
-                    echoCancellation: true
-                }
+                audio: audioTrackConstraints
             });
             const meshRoom = peer.joinRoom(roomName, {
                 mode: 'mesh',

@@ -9,7 +9,12 @@ type TAudioDeviceStoreAction = {
     deviceInfo: TAudioDevice
 };
 
-export default (state = { inputDevice: {}, outputDevice: {} }, action: TAudioDeviceStoreAction) => {
+const initState: TAudioDevice = {
+    deviceId: '',
+    deviceLabel: ''
+};
+
+export default (state = { inputDevice: initState, outputDevice: initState }, action: TAudioDeviceStoreAction) => {
     switch (action.type) {
         case AUDIO_INPUT_DEVICE_ID_STORE:
             state.inputDevice = action.deviceInfo;
