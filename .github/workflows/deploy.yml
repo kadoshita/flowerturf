@@ -1,0 +1,26 @@
+name: Deploy
+
+on:
+  push:
+    branches: 
+    - master
+    - github-actions
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: yarn install
+      run: yarn install
+    - name: set SkyWay API Key
+      run: echo "REACT_APP_SKYWAY_API_KEY=${{ secrets.SKYWAY_API_KEY }}" > .env
+    - name: yarn build
+      run: yarn build
+    - name: deploy to Netlify
+      uses: netlify/actions/cli@master
+      with:
+        args: deploy --dir=build
+      env:
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
