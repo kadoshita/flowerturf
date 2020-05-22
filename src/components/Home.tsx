@@ -12,7 +12,7 @@ const Home = () => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <h1>SkyWay Multi VoiceChat</h1>
+                <h1>FlowerTurf</h1>
             </Grid>
             <Grid item xs={12}>
                 <TextField label="Room ID" required color="primary" style={{ width: '20%' }} onChange={e => { setRoomName(e.target.value); store.dispatch({ type: ROOM_NAME_STORE, name: e.target.value }); }}></TextField>
