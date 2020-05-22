@@ -22,7 +22,7 @@ const DeviceSelect = () => {
     };
     return (
         <FormControl fullWidth style={{ width: '20%' }}>
-            <InputLabel id="audio-input-device-select-label">Audio Input Device</InputLabel>
+            <InputLabel id="audio-input-device-select-label">音声入力デバイス</InputLabel>
             <Select
                 labelId="audio-input-device-select-label"
                 value={inputDevice}

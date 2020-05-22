@@ -92,8 +92,7 @@ const Chat = () => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <h1>FlowerTurf</h1>
-                <p>Room: {roomName}</p>
+                <p>ルーム: {roomName}</p>
             </Grid>
             <Grid item xs={4}>
                 <Grid container>
