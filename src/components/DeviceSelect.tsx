@@ -21,7 +21,7 @@ const DeviceSelect = () => {
         setInputDevice(event.target.value as string);
     };
     return (
-        <FormControl fullWidth style={{ width: '20%' }}>
+        <FormControl>
             <InputLabel id="audio-input-device-select-label">音声入力デバイス</InputLabel>
             <Select
                 labelId="audio-input-device-select-label"
