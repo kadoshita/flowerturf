@@ -9,9 +9,11 @@ const DeviceSelect = () => {
     const [inputDevice, setInputDevice] = useState('');
     useEffect(() => {
         async function getMediaDeviceInfo() {
-            const mediaDevices = await (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audioinput');
-            setDevices(mediaDevices);
-            setInputDevice(mediaDevices[0].deviceId);
+            const mediaDevices = await (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audioinput' && d.label !== '');
+            if (mediaDevices.length > 0) {
+                setDevices(mediaDevices);
+                setInputDevice(mediaDevices[0].deviceId);
+            }
         }
         getMediaDeviceInfo();
     }, []);
@@ -20,18 +22,22 @@ const DeviceSelect = () => {
         store.dispatch({ type: AUDIO_INPUT_DEVICE_ID_STORE, deviceInfo: { deviceId: event.target.value as string, deviceLabel: deviceLabel } });
         setInputDevice(event.target.value as string);
     };
-    return (
-        <FormControl>
-            <InputLabel id="audio-input-device-select-label">音声入力デバイス</InputLabel>
-            <Select
-                labelId="audio-input-device-select-label"
-                value={inputDevice}
-                onChange={handleChange}
-            >
-                {devices.map((d, i) => <MenuItem key={i} value={d.deviceId}>{d.label}</MenuItem>)}
-            </Select>
-        </FormControl>
-    );
+    if (devices.length > 0) {
+        return (
+            <FormControl>
+                <InputLabel id="audio-input-device-select-label">音声入力デバイス</InputLabel>
+                <Select
+                    labelId="audio-input-device-select-label"
+                    value={inputDevice}
+                    onChange={handleChange}
+                >
+                    {devices.map((d, i) => <MenuItem key={i} value={d.deviceId}>{d.label}</MenuItem>)}
+                </Select>
+            </FormControl>
+        );
+    } else {
+        return <></>;
+    }
 };
 
 export default DeviceSelect;
