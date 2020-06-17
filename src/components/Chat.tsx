@@ -3,6 +3,7 @@ import { Grid } from '@material-ui/core';
 import Peer, { RoomStream } from 'skyway-js';
 import { ROOM_NAME_STORE } from '../actions/index';
 import User from './User';
+import TextChat from './TextChat';
 
 import store from '../store/index';
 import deviceStore from '../store/device';
@@ -104,6 +105,9 @@ const Chat = () => {
                         <img src='user.png' alt="user icon" style={{ width: '50%', height: 'auto' }}></img>
                     </Grid>
                     <Grid item xs={4}></Grid>
+                    <Grid item xs={12}>
+                        <TextChat></TextChat>
+                    </Grid>
                 </Grid>
             </Grid>
             <Grid item xs={8}>
