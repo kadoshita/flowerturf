@@ -8,6 +8,11 @@ import TextChat from './TextChat';
 import store from '../store/index';
 import deviceStore from '../store/device';
 
+type ChatMessage = {
+    user: string,
+    message: string
+};
+
 const parseQueryParameter = (query: string): { [key: string]: string } => {
     let params: Array<string> = query.split('&');
     let paramObject: { [key: string]: string } = {};
@@ -39,6 +44,7 @@ const Chat = () => {
     const state = store.getState();
     const [myId, setMyId] = useState('');
     const [userStreams, setUserStreams] = useState<RoomStream[]>([]);
+    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{ user: 'user1', message: 'sample message1' }, { user: 'user2', message: 'sample message2' }]);
     const parameters = parseQueryParameter(window.location.search.replace('?', ''));
     const roomName = (state.roomname === '') ? parameters.room : state.roomname;
     if (roomName === '') {
@@ -106,7 +112,7 @@ const Chat = () => {
                     </Grid>
                     <Grid item xs={4}></Grid>
                     <Grid item xs={12}>
-                        <TextChat></TextChat>
+                        <TextChat chatMessages={chatMessages}></TextChat>
                     </Grid>
                 </Grid>
             </Grid>
