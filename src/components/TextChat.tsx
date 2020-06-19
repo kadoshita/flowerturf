@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Grid, List, ListItem, ListItemText, Input } from '@material-ui/core';
 
 type ChatMessage = {
@@ -6,10 +6,12 @@ type ChatMessage = {
     message: string
 };
 type TextChatProps = {
-    chatMessages: ChatMessage[]
+    chatMessages: ChatMessage[],
+    sendChatMessage: any
 }
 
 const TextChat = (props: TextChatProps) => {
+    const [sendMessage, setSendMessage] = useState('');
     return (
         <Grid container spacing={4}>
             <Grid item xs={12}>
@@ -26,10 +28,10 @@ const TextChat = (props: TextChatProps) => {
                 </List>
             </Grid>
             <Grid item xs={10}>
-                <Input fullWidth></Input>
+                <Input fullWidth onChange={e => setSendMessage(e.target.value)}></Input>
             </Grid>
             <Grid item xs={2}>
-                <Button fullWidth color='primary' variant='contained'>送信</Button>
+                <Button fullWidth color='primary' variant='contained' onClick={() => props.sendChatMessage(sendMessage)}>送信</Button>
             </Grid>
         </Grid>
     );

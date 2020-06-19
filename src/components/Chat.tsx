@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Grid } from '@material-ui/core';
-import Peer, { RoomStream } from 'skyway-js';
+import Peer, { RoomStream, MeshRoom } from 'skyway-js';
 import { ROOM_NAME_STORE } from '../actions/index';
 import User from './User';
 import TextChat from './TextChat';
@@ -43,8 +43,9 @@ const getMediaTrackConstraints = (): MediaTrackConstraints => {
 const Chat = () => {
     const state = store.getState();
     const [myId, setMyId] = useState('');
+    const [meshRoom, setMeshRoom] = useState<MeshRoom>();
     const [userStreams, setUserStreams] = useState<RoomStream[]>([]);
-    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{ user: 'user1', message: 'sample message1' }, { user: 'user2', message: 'sample message2' }]);
+    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
     const parameters = parseQueryParameter(window.location.search.replace('?', ''));
     const roomName = (state.roomname === '') ? parameters.room : state.roomname;
     if (roomName === '') {
@@ -68,27 +69,38 @@ const Chat = () => {
                 video: false,
                 audio: audioTrackConstraints
             });
-            const meshRoom = peer.joinRoom(roomName, {
+            const _meshRoom = peer.joinRoom(roomName, {
                 mode: 'mesh',
                 stream: localAudioStream
             });
-            meshRoom.on('open', () => {
+            _meshRoom.on('open', () => {
                 console.log(`Join room ${roomName}`);
             });
 
-            meshRoom.on('stream', stream => {
+            _meshRoom.on('stream', stream => {
                 console.log(`User ${stream.peerId} streaming start`);
                 const _userStreams = [...userStreams];
                 _userStreams.push(stream);
                 setUserStreams(_userStreams);
             });
-            meshRoom.on('peerLeave', peerId => {
+            _meshRoom.on('peerLeave', peerId => {
                 console.log(`User ${peerId} leave`);
                 const _userStreams = [...userStreams];
                 const leavePeerStreamIndex = _userStreams.findIndex(s => s.peerId === peerId);
                 _userStreams.splice(leavePeerStreamIndex, 1);
                 setUserStreams(_userStreams);
             });
+            _meshRoom.on('data', data => {
+                console.log(data);
+                const chatHistory = [...chatMessages];
+                chatHistory.push({
+                    user: data.src,
+                    message: data.data
+                });
+                setChatMessages(chatHistory);
+            });
+
+            setMeshRoom(_meshRoom as MeshRoom);
         });
 
         return () => {
@@ -112,7 +124,7 @@ const Chat = () => {
                     </Grid>
                     <Grid item xs={4}></Grid>
                     <Grid item xs={12}>
-                        <TextChat chatMessages={chatMessages}></TextChat>
+                        <TextChat chatMessages={chatMessages} sendChatMessage={(msg: string) => meshRoom?.send(msg)}></TextChat>
                     </Grid>
                 </Grid>
             </Grid>
