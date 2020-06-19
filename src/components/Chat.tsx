@@ -56,6 +56,21 @@ const Chat = () => {
         store.dispatch({ type: ROOM_NAME_STORE, name: roomName });
     }
 
+    const pushChatMessage = (user: string, message: string) => {
+        setChatMessages(prevChatMessages => {
+            const newChatMessages = [...prevChatMessages];
+            newChatMessages.push({
+                user: user,
+                message: message
+            });
+            return newChatMessages;
+        });
+    };
+
+    const sendChatMessage = (msg: string) => {
+        meshRoom?.send(msg);
+        pushChatMessage(myId, msg);
+    };
     useEffect(() => {
         const apiKey = process.env.REACT_APP_SKYWAY_API_KEY || '';
         const peer = new Peer({
@@ -91,13 +106,7 @@ const Chat = () => {
                 setUserStreams(_userStreams);
             });
             _meshRoom.on('data', data => {
-                console.log(data);
-                const chatHistory = [...chatMessages];
-                chatHistory.push({
-                    user: data.src,
-                    message: data.data
-                });
-                setChatMessages(chatHistory);
+                pushChatMessage(data.src, data.data);
             });
 
             setMeshRoom(_meshRoom as MeshRoom);
@@ -124,7 +133,7 @@ const Chat = () => {
                     </Grid>
                     <Grid item xs={4}></Grid>
                     <Grid item xs={12}>
-                        <TextChat chatMessages={chatMessages} sendChatMessage={(msg: string) => meshRoom?.send(msg)}></TextChat>
+                        <TextChat chatMessages={chatMessages} sendChatMessage={sendChatMessage}></TextChat>
                     </Grid>
                 </Grid>
             </Grid>

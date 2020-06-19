@@ -28,10 +28,10 @@ const TextChat = (props: TextChatProps) => {
                 </List>
             </Grid>
             <Grid item xs={10}>
-                <Input fullWidth onChange={e => setSendMessage(e.target.value)}></Input>
+                <Input fullWidth value={sendMessage} onChange={e => setSendMessage(e.target.value)}></Input>
             </Grid>
             <Grid item xs={2}>
-                <Button fullWidth color='primary' variant='contained' onClick={() => props.sendChatMessage(sendMessage)}>送信</Button>
+                <Button fullWidth color='primary' variant='contained' onClick={() => { props.sendChatMessage(sendMessage); setSendMessage('') }}>送信</Button>
             </Grid>
         </Grid>
     );
