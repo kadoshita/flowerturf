@@ -58,7 +58,7 @@ const TextChat = (props: TextChatProps) => {
             <Grid item xs={12} style={{ height: '1%' }}>
                 <Divider></Divider>
             </Grid>
-            <Grid item xs={10} style={{ height: '9%' }}>
+            <Grid item xs={10} style={{ height: '9%', paddingRight: '4px' }}>
                 <Input fullWidth value={sendMessage} onChange={e => setSendMessage(e.target.value)}></Input>
             </Grid>
             <Grid item xs={2} style={{ height: '9%' }}>
