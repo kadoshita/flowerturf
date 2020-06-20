@@ -34,6 +34,9 @@ const TextChat = (props: TextChatProps) => {
                                         primary={msg.user}
                                         secondary={msg.message}
                                         ref={chatMessagesLastItem}
+                                        style={{
+                                            overflowWrap: 'break-word'
+                                        }}
                                     ></ListItemText>
                                 </ListItem>
                             );
@@ -42,7 +45,11 @@ const TextChat = (props: TextChatProps) => {
                             <ListItem key={i} divider>
                                 <ListItemText
                                     primary={msg.user}
-                                    secondary={msg.message}></ListItemText>
+                                    secondary={msg.message}
+                                    style={{
+                                        overflowWrap: 'break-word'
+                                    }}
+                                ></ListItemText>
                             </ListItem>
                         );
                     })}
