@@ -118,26 +118,26 @@ const Chat = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [roomName]);
     return (
-        <Grid container>
-            <Grid item xs={12}>
-                <p>ルーム: {roomName}</p>
+        <Grid container style={{ height: '100%' }}>
+            <Grid item xs={12} style={{ height: '5%' }}>
+                <p style={{ margin: '0px' }}>ルーム: {roomName}</p>
             </Grid>
-            <Grid item xs={4}>
-                <Grid container>
-                    <Grid item xs={12}>
-                        <p style={{ fontSize: '130%' }}>{(state.username !== '') ? state.username : myId}</p>
+            <Grid item xs={4} style={{ height: '95%' }}>
+                <Grid container style={{ height: '100%' }}>
+                    <Grid item xs={12} style={{ height: '5%' }}>
+                        <p style={{ fontSize: '130%', margin: '0px' }}>{(state.username !== '') ? state.username : myId}</p>
                     </Grid>
-                    <Grid item xs={4}></Grid>
-                    <Grid item xs={4}>
-                        <img src='user.png' alt="user icon" style={{ width: '50%', height: 'auto' }}></img>
+                    <Grid item xs={4} style={{ height: '20%' }}></Grid>
+                    <Grid item xs={4} style={{ height: '20%' }}>
+                        <img src='user.png' alt="user icon" style={{ width: 'auto', height: '80%' }}></img>
                     </Grid>
-                    <Grid item xs={4}></Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={4} style={{ height: '20%' }}></Grid>
+                    <Grid item xs={12} style={{ height: '75%' }}>
                         <TextChat chatMessages={chatMessages} sendChatMessage={sendChatMessage}></TextChat>
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid item xs={8}>
+            <Grid item xs={8} style={{ height: '95%' }}>
                 <Grid container>
                     {userStreams.map((u, i) => <Grid item xs={2} key={i}><User stream={u}></User></Grid>)}
                 </Grid>

@@ -18,7 +18,7 @@ const User = (props: UserProps) => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <p style={{ fontSize: '130%' }}>{props.stream.peerId}</p>
+                <p style={{ fontSize: '130%', overflowX: 'scroll' }}>{props.stream.peerId}</p>
             </Grid>
             <Grid item xs={4}></Grid>
             <Grid item xs={4}>
