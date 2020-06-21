@@ -56,6 +56,7 @@ const Chat = () => {
     const [myId, setMyId] = useState('');
     const [meshRoom, setMeshRoom] = useState<MeshRoom>();
     const [userList, setUserList] = useState<UserListItem[]>([]);
+    const [newChatMessage, setNewChatMessage] = useState<ChatMessage>();
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
     const parameters = parseQueryParameter(window.location.search.replace('?', ''));
     const roomName = (state.roomname === '') ? parameters.room : state.roomname;
@@ -69,24 +70,13 @@ const Chat = () => {
         store.dispatch({ type: ROOM_NAME_STORE, name: roomName });
     }
 
-    const pushChatMessage = (user: string, message: string) => {
-        setChatMessages(prevChatMessages => {
-            const newChatMessages = [...prevChatMessages];
-            newChatMessages.push({
-                user: user,
-                message: message
-            });
-            return newChatMessages;
-        });
-    };
-
     const sendChatMessage = (msg: string) => {
         const sendData = {
             message: msg,
             type: ActionType.MESSAGE
         };
         meshRoom?.send(sendData);
-        pushChatMessage(myId, msg);
+        setNewChatMessage({ user: myId, message: msg });
     };
     useEffect(() => {
         const apiKey = process.env.REACT_APP_SKYWAY_API_KEY || '';
@@ -166,7 +156,7 @@ const Chat = () => {
                             return newUserList;
                         })
                         break;
-                    case ActionType.MESSAGE: pushChatMessage(data.src, data.data.message); break;
+                    case ActionType.MESSAGE: setNewChatMessage({ user: data.src, message: data.data.message }); break;
                 }
             });
 
@@ -178,6 +168,19 @@ const Chat = () => {
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [roomName]);
+    useEffect(() => {
+        if (newChatMessage) {
+            setChatMessages(prevChatMessages => {
+                const newChatMessages = [...prevChatMessages];
+                const sendMessageUserName = userList.find(u => u.id === newChatMessage.user)?.name;
+                const chatMessage = { ...newChatMessage };
+                chatMessage.user = (sendMessageUserName) ? sendMessageUserName : (newChatMessage.user === myId && userName) ? userName : newChatMessage.user;
+                newChatMessages.push(chatMessage);
+                return newChatMessages;
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [newChatMessage]);
     return (
         <Grid container style={{ height: '100%' }}>
             <Grid item xs={12} style={{ height: '5%' }}>
