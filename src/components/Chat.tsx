@@ -13,8 +13,14 @@ type ChatMessage = {
     message: string
 };
 
+type UserListItem = {
+    id: string,
+    name: string,
+    stream?: RoomStream
+};
+
 enum ActionType {
-    JOIN,
+    NOTICE_NAME,
     MESSAGE
 };
 
@@ -49,10 +55,12 @@ const Chat = () => {
     const state = store.getState();
     const [myId, setMyId] = useState('');
     const [meshRoom, setMeshRoom] = useState<MeshRoom>();
-    const [userStreams, setUserStreams] = useState<RoomStream[]>([]);
+    const [userList, setUserList] = useState<UserListItem[]>([]);
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
     const parameters = parseQueryParameter(window.location.search.replace('?', ''));
     const roomName = (state.roomname === '') ? parameters.room : state.roomname;
+    const userName = state.username;
+
     if (roomName === '') {
         window.location.href = window.location.origin;
     } else if (!Object.keys(parameters).includes('room')) {
@@ -99,28 +107,65 @@ const Chat = () => {
             });
             _meshRoom.on('open', () => {
                 console.log(`Join room ${roomName}`);
+                if (userName !== '') {
+                    _meshRoom.send({
+                        type: ActionType.NOTICE_NAME,
+                        name: userName
+                    });
+                }
+            });
+
+            _meshRoom.on('peerJoin', () => {
+                if (userName !== '') {
+                    _meshRoom.send({
+                        type: ActionType.NOTICE_NAME,
+                        name: userName
+                    });
+                }
+            });
+            _meshRoom.on('peerLeave', peerId => {
+                console.log(`User ${peerId} leave`);
+                setUserList(currentUserList => {
+                    const newUserList = [...currentUserList];
+                    const leaveUserIndex = newUserList.findIndex(s => s.id === peerId);
+                    newUserList.splice(leaveUserIndex, 1);
+                    return newUserList;
+                });
             });
 
             _meshRoom.on('stream', stream => {
                 console.log(`User ${stream.peerId} streaming start`);
-                setUserStreams(prevUserStreams => {
-                    const newUserStreams = [...prevUserStreams];
-                    newUserStreams.push(stream);
-                    return newUserStreams;
-                });
-            });
-            _meshRoom.on('peerLeave', peerId => {
-                console.log(`User ${peerId} leave`);
-                setUserStreams(prevUserStreams => {
-                    const newUserStreams = [...prevUserStreams];
-                    const leavePeerStreamIndex = newUserStreams.findIndex(s => s.peerId === peerId);
-                    newUserStreams.splice(leavePeerStreamIndex, 1);
-                    return newUserStreams;
+                setUserList(currentUserList => {
+                    const newUserList = [...currentUserList];
+                    const streamStartUserIndex = newUserList.findIndex(u => u.id === stream.peerId);
+                    if (streamStartUserIndex === -1) {
+                        newUserList.push({
+                            id: stream.peerId,
+                            name: '',
+                            stream: stream
+                        });
+                    } else {
+                        newUserList[streamStartUserIndex].stream = stream;
+                    }
+                    return newUserList;
                 });
             });
             _meshRoom.on('data', data => {
                 switch (data.data.type) {
-                    case ActionType.JOIN: break;
+                    case ActionType.NOTICE_NAME:
+                        setUserList(currentUserList => {
+                            const newUserList = [...currentUserList];
+                            const newUserIndex = newUserList.findIndex(u => u.id === data.src);
+                            if (newUserIndex === -1) {
+                                newUserList.push({
+                                    id: data.src,
+                                    name: data.data.name,
+                                    stream: undefined
+                                });
+                            }
+                            return newUserList;
+                        })
+                        break;
                     case ActionType.MESSAGE: pushChatMessage(data.src, data.data.message); break;
                 }
             });
@@ -155,7 +200,7 @@ const Chat = () => {
             </Grid>
             <Grid item xs={8} style={{ height: '95%' }}>
                 <Grid container>
-                    {userStreams.map((u, i) => <Grid item xs={2} key={i}><User stream={u}></User></Grid>)}
+                    {userList.map((u, i) => <Grid item xs={2} key={i}><User name={u.name || u.id} stream={u.stream}></User></Grid>)}
                 </Grid>
             </Grid>
         </Grid>

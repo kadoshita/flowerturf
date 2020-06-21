@@ -3,14 +3,15 @@ import { Grid } from '@material-ui/core';
 import { RoomStream } from 'skyway-js';
 
 type UserProps = {
-    stream: RoomStream
+    name: string,
+    stream?: RoomStream
 };
 const User = (props: UserProps) => {
     const audioRef = useRef<HTMLAudioElement>(null);
 
     useEffect(() => {
         const $audio = audioRef.current;
-        if ($audio !== null) {
+        if ($audio !== null && props.stream) {
             $audio.srcObject = props.stream;
         }
     }, [props.stream]);
@@ -18,7 +19,7 @@ const User = (props: UserProps) => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <p>{props.stream.peerId}</p>
+                <p>{props.name}</p>
             </Grid>
             <Grid item xs={4}></Grid>
             <Grid item xs={4}>
