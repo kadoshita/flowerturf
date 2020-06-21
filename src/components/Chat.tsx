@@ -94,16 +94,20 @@ const Chat = () => {
 
             _meshRoom.on('stream', stream => {
                 console.log(`User ${stream.peerId} streaming start`);
-                const _userStreams = [...userStreams];
-                _userStreams.push(stream);
-                setUserStreams(_userStreams);
+                setUserStreams(prevUserStreams => {
+                    const newUserStreams = [...prevUserStreams];
+                    newUserStreams.push(stream);
+                    return newUserStreams;
+                });
             });
             _meshRoom.on('peerLeave', peerId => {
                 console.log(`User ${peerId} leave`);
-                const _userStreams = [...userStreams];
-                const leavePeerStreamIndex = _userStreams.findIndex(s => s.peerId === peerId);
-                _userStreams.splice(leavePeerStreamIndex, 1);
-                setUserStreams(_userStreams);
+                setUserStreams(prevUserStreams => {
+                    const newUserStreams = [...prevUserStreams];
+                    const leavePeerStreamIndex = newUserStreams.findIndex(s => s.peerId === peerId);
+                    newUserStreams.splice(leavePeerStreamIndex, 1);
+                    return newUserStreams;
+                });
             });
             _meshRoom.on('data', data => {
                 pushChatMessage(data.src, data.data);
