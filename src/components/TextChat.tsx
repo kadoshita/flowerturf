@@ -53,11 +53,11 @@ const TextChat = (props: TextChatProps) => {
                                     <ListItemText
                                         primary={msg.user}
                                         secondary={
-                                            <div
+                                            <span
                                                 dangerouslySetInnerHTML={{
                                                     __html: sanitizingAndAutolinkMessage(msg.message)
                                                 }}>
-                                            </div>
+                                            </span>
                                         }
                                         ref={chatMessagesLastItem}
                                         style={{
@@ -72,11 +72,11 @@ const TextChat = (props: TextChatProps) => {
                                 <ListItemText
                                     primary={msg.user}
                                     secondary={
-                                        <div
+                                        <span
                                             dangerouslySetInnerHTML={{
                                                 __html: sanitizingAndAutolinkMessage(msg.message)
                                             }}>
-                                        </div>
+                                        </span>
                                     }
                                     style={{
                                         overflowWrap: 'break-word'
