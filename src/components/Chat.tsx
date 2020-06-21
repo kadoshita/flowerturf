@@ -13,6 +13,11 @@ type ChatMessage = {
     message: string
 };
 
+enum ActionType {
+    JOIN,
+    MESSAGE
+};
+
 const parseQueryParameter = (query: string): { [key: string]: string } => {
     let params: Array<string> = query.split('&');
     let paramObject: { [key: string]: string } = {};
@@ -68,7 +73,11 @@ const Chat = () => {
     };
 
     const sendChatMessage = (msg: string) => {
-        meshRoom?.send(msg);
+        const sendData = {
+            message: msg,
+            type: ActionType.MESSAGE
+        };
+        meshRoom?.send(sendData);
         pushChatMessage(myId, msg);
     };
     useEffect(() => {
@@ -110,7 +119,10 @@ const Chat = () => {
                 });
             });
             _meshRoom.on('data', data => {
-                pushChatMessage(data.src, data.data);
+                switch (data.data.type) {
+                    case ActionType.JOIN: break;
+                    case ActionType.MESSAGE: pushChatMessage(data.src, data.data.message); break;
+                }
             });
 
             setMeshRoom(_meshRoom as MeshRoom);
