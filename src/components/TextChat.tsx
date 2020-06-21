@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button, Grid, List, ListItem, ListItemText, Input, Divider } from '@material-ui/core';
+import AutoLinker from 'autolinker';
 
 type ChatMessage = {
     user: string,
@@ -32,7 +33,20 @@ const TextChat = (props: TextChatProps) => {
                                 <ListItem key={i} divider>
                                     <ListItemText
                                         primary={msg.user}
-                                        secondary={msg.message}
+                                        secondary={
+                                            <div
+                                                dangerouslySetInnerHTML={{
+                                                    __html: AutoLinker.link(msg.message, {
+                                                        newWindow: true,
+                                                        replaceFn: match => {
+                                                            const tag = match.buildTag();
+                                                            tag.setAttr('rel', 'nofollow noopener');
+                                                            return tag;
+                                                        }
+                                                    })
+                                                }}>
+                                            </div>
+                                        }
                                         ref={chatMessagesLastItem}
                                         style={{
                                             overflowWrap: 'break-word'
