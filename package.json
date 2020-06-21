@@ -18,6 +18,7 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
     "redux": "^4.0.5",
+    "sanitize-html": "^1.27.0",
     "skyway-js": "^2.0.5",
     "typescript": "~3.7.2"
   },
@@ -44,6 +45,7 @@
   },
   "devDependencies": {
     "@types/react-router": "^5.1.5",
-    "@types/react-router-dom": "^5.1.4"
+    "@types/react-router-dom": "^5.1.4",
+    "@types/sanitize-html": "^1.23.2"
   }
 }

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button, Grid, List, ListItem, ListItemText, Input, Divider } from '@material-ui/core';
 import AutoLinker from 'autolinker';
+import sanitizeHtml from 'sanitize-html';
 
 type ChatMessage = {
     user: string,
@@ -10,6 +11,24 @@ type TextChatProps = {
     chatMessages: ChatMessage[],
     sendChatMessage: any
 }
+
+const sanitizingAndAutolinkMessage = (message: string) => {
+    return sanitizeHtml(
+        AutoLinker.link(message, {
+            newWindow: true,
+            replaceFn: match => {
+                const tag = match.buildTag();
+                tag.setAttr('rel', 'nofollow noopener');
+                return tag;
+            }
+        }), {
+        allowedTags: ['a', 'b'],
+        allowedAttributes: {
+            'a': ['href']
+        },
+        disallowedTagsMode: 'escape'
+    })
+};
 
 const TextChat = (props: TextChatProps) => {
     const [sendMessage, setSendMessage] = useState('');
@@ -36,14 +55,7 @@ const TextChat = (props: TextChatProps) => {
                                         secondary={
                                             <div
                                                 dangerouslySetInnerHTML={{
-                                                    __html: AutoLinker.link(msg.message, {
-                                                        newWindow: true,
-                                                        replaceFn: match => {
-                                                            const tag = match.buildTag();
-                                                            tag.setAttr('rel', 'nofollow noopener');
-                                                            return tag;
-                                                        }
-                                                    })
+                                                    __html: sanitizingAndAutolinkMessage(msg.message)
                                                 }}>
                                             </div>
                                         }
@@ -59,7 +71,13 @@ const TextChat = (props: TextChatProps) => {
                             <ListItem key={i} divider>
                                 <ListItemText
                                     primary={msg.user}
-                                    secondary={msg.message}
+                                    secondary={
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html: sanitizingAndAutolinkMessage(msg.message)
+                                            }}>
+                                        </div>
+                                    }
                                     style={{
                                         overflowWrap: 'break-word'
                                     }}
