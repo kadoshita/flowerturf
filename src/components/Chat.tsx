@@ -23,7 +23,8 @@ type UserListItem = {
 
 enum ActionType {
     NOTICE_NAME,
-    MESSAGE
+    MESSAGE,
+    NOTICE_IS_SPEAKING
 };
 
 const parseQueryParameter = (query: string): { [key: string]: string } => {
@@ -166,9 +167,20 @@ const Chat = () => {
                                 });
                             }
                             return newUserList;
-                        })
+                        });
                         break;
                     case ActionType.MESSAGE: setNewChatMessage({ user: data.src, message: data.data.message }); break;
+                    case ActionType.NOTICE_IS_SPEAKING:
+                        setUserList(currentUserList => {
+                            const newUserList = [...currentUserList].map(u => {
+                                if (data.src === u.id) {
+                                    u.isSpeaking = data.data.isSpeaking;
+                                }
+                                return u;
+                            });
+                            return newUserList;
+                        });
+                        break;
                 }
             });
 
@@ -194,7 +206,10 @@ const Chat = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [newChatMessage]);
     useEffect(() => {
-        sendChatMessage(isSpeaking ? 'speech start' : 'speech stop');
+        meshRoom?.send({
+            isSpeaking: isSpeaking,
+            type: ActionType.NOTICE_IS_SPEAKING
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isSpeaking]);
     return (
