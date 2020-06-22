@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Grid } from '@material-ui/core';
 import Peer, { RoomStream, MeshRoom } from 'skyway-js';
+import hark from 'hark';
 import { ROOM_NAME_STORE } from '../actions/index';
 import User from './User';
 import TextChat from './TextChat';
@@ -54,6 +55,7 @@ const getMediaTrackConstraints = (): MediaTrackConstraints => {
 const Chat = () => {
     const state = store.getState();
     const [myId, setMyId] = useState('');
+    const [isSpeaking, setIsSpeaking] = useState(false);
     const [meshRoom, setMeshRoom] = useState<MeshRoom>();
     const [userList, setUserList] = useState<UserListItem[]>([]);
     const [newChatMessage, setNewChatMessage] = useState<ChatMessage>();
@@ -90,6 +92,13 @@ const Chat = () => {
             const localAudioStream = await navigator.mediaDevices.getUserMedia({
                 video: false,
                 audio: audioTrackConstraints
+            });
+            const speechEvent = hark(localAudioStream, {});
+            speechEvent.on('speaking', () => {
+                setIsSpeaking(true);
+            });
+            speechEvent.on('stopped_speaking', () => {
+                setIsSpeaking(false);
             });
             const _meshRoom = peer.joinRoom(roomName, {
                 mode: 'mesh',
@@ -181,6 +190,10 @@ const Chat = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [newChatMessage]);
+    useEffect(() => {
+        sendChatMessage(isSpeaking ? 'speech start' : 'speech stop');
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isSpeaking]);
     return (
         <Grid container style={{ height: '100%' }}>
             <Grid item xs={12} style={{ height: '5%' }}>
