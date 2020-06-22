@@ -4,7 +4,8 @@ import { RoomStream } from 'skyway-js';
 
 type UserProps = {
     name: string,
-    stream?: RoomStream
+    stream?: RoomStream,
+    isSpeaking: boolean
 };
 const User = (props: UserProps) => {
     const audioRef = useRef<HTMLAudioElement>(null);
@@ -23,7 +24,7 @@ const User = (props: UserProps) => {
             </Grid>
             <Grid item xs={4}></Grid>
             <Grid item xs={4}>
-                <img src='user.png' alt="user icon" style={{ width: '50%', height: 'auto' }}></img>
+                <img src='user.png' alt="user icon" style={{ width: '50%', height: 'auto', borderColor: (props.isSpeaking ? '#108675' : '#ffffff'), borderStyle: 'solid', borderWidth: '2px' }}></img>
                 <audio ref={audioRef} autoPlay></audio>
             </Grid>
             <Grid item xs={4}></Grid>

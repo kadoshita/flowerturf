@@ -17,7 +17,8 @@ type ChatMessage = {
 type UserListItem = {
     id: string,
     name: string,
-    stream?: RoomStream
+    stream?: RoomStream,
+    isSpeaking: boolean
 };
 
 enum ActionType {
@@ -141,7 +142,8 @@ const Chat = () => {
                         newUserList.push({
                             id: stream.peerId,
                             name: '',
-                            stream: stream
+                            stream: stream,
+                            isSpeaking: false
                         });
                     } else {
                         newUserList[streamStartUserIndex].stream = stream;
@@ -159,7 +161,8 @@ const Chat = () => {
                                 newUserList.push({
                                     id: data.src,
                                     name: data.data.name,
-                                    stream: undefined
+                                    stream: undefined,
+                                    isSpeaking: false
                                 });
                             }
                             return newUserList;
@@ -206,7 +209,7 @@ const Chat = () => {
                     </Grid>
                     <Grid item xs={4} style={{ height: '20%' }}></Grid>
                     <Grid item xs={4} style={{ height: '20%' }}>
-                        <img src='user.png' alt="user icon" style={{ width: 'auto', height: '80%' }}></img>
+                        <img src='user.png' alt="user icon" style={{ width: 'auto', height: '80%', borderColor: (isSpeaking ? '#108675' : '#ffffff'), borderStyle: 'solid', borderWidth: '2px' }}></img>
                     </Grid>
                     <Grid item xs={4} style={{ height: '20%' }}></Grid>
                     <Grid item xs={12} style={{ height: '75%' }}>
@@ -216,7 +219,7 @@ const Chat = () => {
             </Grid>
             <Grid item xs={8} style={{ height: '95%' }}>
                 <Grid container>
-                    {userList.map((u, i) => <Grid item xs={2} key={i}><User name={u.name || u.id} stream={u.stream}></User></Grid>)}
+                    {userList.map((u, i) => <Grid item xs={2} key={i}><User name={u.name || u.id} stream={u.stream} isSpeaking={u.isSpeaking}></User></Grid>)}
                 </Grid>
             </Grid>
         </Grid>
