@@ -24,7 +24,7 @@ const DeviceSelect = () => {
     };
     if (devices.length > 0) {
         return (
-            <FormControl>
+            <FormControl fullWidth>
                 <InputLabel id="audio-input-device-select-label">音声入力デバイス</InputLabel>
                 <Select
                     labelId="audio-input-device-select-label"
