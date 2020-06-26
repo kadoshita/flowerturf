@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Grid } from '@material-ui/core';
+import { Grid, TextField } from '@material-ui/core';
 import Peer, { RoomStream, MeshRoom } from 'skyway-js';
 import hark from 'hark';
-import { ROOM_NAME_STORE } from '../actions/index';
+import { ROOM_NAME_STORE, USER_NAME_STORE } from '../actions/index';
 import User from './User';
 import TextChat from './TextChat';
 
@@ -57,6 +57,7 @@ const getMediaTrackConstraints = (): MediaTrackConstraints => {
 const Chat = () => {
     const state = store.getState();
     const [myId, setMyId] = useState('');
+    const [userName, setUserName] = useState(state.username)
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [meshRoom, setMeshRoom] = useState<MeshRoom>();
     const [userList, setUserList] = useState<UserListItem[]>([]);
@@ -64,7 +65,6 @@ const Chat = () => {
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
     const parameters = parseQueryParameter(window.location.search.replace('?', ''));
     const roomName = (state.roomname === '') ? parameters.room : state.roomname;
-    const userName = state.username;
 
     if (roomName === '') {
         window.location.href = window.location.origin;
@@ -90,6 +90,7 @@ const Chat = () => {
         peer.on('open', async id => {
             console.log(`Conenction established between SkyWay Server!! My ID is ${id}`);
             setMyId(id);
+            setUserName((userName === '') ? id : userName);
             const audioTrackConstraints = getMediaTrackConstraints()
             const localAudioStream = await navigator.mediaDevices.getUserMedia({
                 video: false,
@@ -165,8 +166,15 @@ const Chat = () => {
                                     stream: undefined,
                                     isSpeaking: false
                                 });
+                                return newUserList;
+                            } else {
+                                return [...currentUserList].map(u => {
+                                    if (u.id === data.src) {
+                                        u.name = data.data.name;
+                                    }
+                                    return u;
+                                });
                             }
-                            return newUserList;
                         });
                         break;
                     case ActionType.MESSAGE: setNewChatMessage({ user: data.src, message: data.data.message }); break;
@@ -212,6 +220,15 @@ const Chat = () => {
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isSpeaking]);
+    useEffect(() => {
+        const sendUserName = (userName !== '') ? userName : myId;
+        meshRoom?.send({
+            type: ActionType.NOTICE_NAME,
+            name: sendUserName
+        });
+        store.dispatch({ type: USER_NAME_STORE, name: sendUserName });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userName]);
     return (
         <Grid container style={{ height: '100%' }}>
             <Grid item xs={12} style={{ height: '5%' }}>
@@ -220,7 +237,11 @@ const Chat = () => {
             <Grid item xs={4} style={{ height: '95%' }}>
                 <Grid container style={{ height: '100%' }}>
                     <Grid item xs={12} style={{ height: '5%' }}>
-                        <p style={{ fontSize: '130%', margin: '0px' }}>{(state.username !== '') ? state.username : myId}</p>
+                        <TextField
+                            style={{ fontSize: '130%', margin: '0px' }}
+                            value={userName}
+                            onChange={e => { setUserName(e.target.value) }}
+                        ></TextField>
                     </Grid>
                     <Grid item xs={4} style={{ height: '20%' }}></Grid>
                     <Grid item xs={4} style={{ height: '20%' }}>
@@ -237,7 +258,7 @@ const Chat = () => {
                     {userList.map((u, i) => <Grid item xs={2} key={i}><User name={u.name || u.id} stream={u.stream} isSpeaking={u.isSpeaking}></User></Grid>)}
                 </Grid>
             </Grid>
-        </Grid>
+        </Grid >
     )
 };
 
