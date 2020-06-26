@@ -17,6 +17,7 @@ type ChatMessage = {
 type UserListItem = {
     id: string,
     name: string,
+    icon: string,
     stream?: RoomStream,
     isSpeaking: boolean
 };
@@ -113,7 +114,8 @@ const Chat = () => {
                 if (userName !== '') {
                     _meshRoom.send({
                         type: ActionType.NOTICE_NAME,
-                        name: userName
+                        name: userName,
+                        icon: userIconUrl
                     });
                 }
             });
@@ -122,7 +124,8 @@ const Chat = () => {
                 if (userName !== '') {
                     _meshRoom.send({
                         type: ActionType.NOTICE_NAME,
-                        name: userName
+                        name: userName,
+                        icon: userIconUrl
                     });
                 }
             });
@@ -145,6 +148,7 @@ const Chat = () => {
                         newUserList.push({
                             id: stream.peerId,
                             name: '',
+                            icon: 'user.png',
                             stream: stream,
                             isSpeaking: false
                         });
@@ -164,6 +168,7 @@ const Chat = () => {
                                 newUserList.push({
                                     id: data.src,
                                     name: data.data.name,
+                                    icon: (data.data.icon !== '') ? data.data.icon : 'user.png',
                                     stream: undefined,
                                     isSpeaking: false
                                 });
@@ -225,7 +230,8 @@ const Chat = () => {
         const sendUserName = (userName !== '') ? userName : myId;
         meshRoom?.send({
             type: ActionType.NOTICE_NAME,
-            name: sendUserName
+            name: sendUserName,
+            icon: userIconUrl
         });
         store.dispatch({ type: USER_NAME_STORE, value: sendUserName });
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -256,7 +262,7 @@ const Chat = () => {
             </Grid>
             <Grid item xs={8} style={{ height: '95%' }}>
                 <Grid container>
-                    {userList.map((u, i) => <Grid item xs={2} key={i}><User name={u.name || u.id} stream={u.stream} isSpeaking={u.isSpeaking}></User></Grid>)}
+                    {userList.map((u, i) => <Grid item xs={2} key={i}><User name={u.name || u.id} icon={u.icon} stream={u.stream} isSpeaking={u.isSpeaking}></User></Grid>)}
                 </Grid>
             </Grid>
         </Grid >
