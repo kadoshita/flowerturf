@@ -65,13 +65,14 @@ const Chat = () => {
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
     const parameters = parseQueryParameter(window.location.search.replace('?', ''));
     const roomName = (state.roomname === '') ? parameters.room : state.roomname;
+    const userIconUrl = state.usericon;
 
     if (roomName === '') {
         window.location.href = window.location.origin;
     } else if (!Object.keys(parameters).includes('room')) {
         window.history.replaceState('', '', `${window.location.origin}/chat?room=${roomName}`);
     } else {
-        store.dispatch({ type: ROOM_NAME_STORE, name: roomName });
+        store.dispatch({ type: ROOM_NAME_STORE, value: roomName });
     }
 
     const sendChatMessage = (msg: string) => {
@@ -226,7 +227,7 @@ const Chat = () => {
             type: ActionType.NOTICE_NAME,
             name: sendUserName
         });
-        store.dispatch({ type: USER_NAME_STORE, name: sendUserName });
+        store.dispatch({ type: USER_NAME_STORE, value: sendUserName });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userName]);
     return (
@@ -245,7 +246,7 @@ const Chat = () => {
                     </Grid>
                     <Grid item xs={4} style={{ height: '20%' }}></Grid>
                     <Grid item xs={4} style={{ height: '20%' }}>
-                        <img src='user.png' alt="user icon" style={{ width: 'auto', height: '80%', borderColor: (isSpeaking ? '#108675' : '#ffffff'), borderStyle: 'solid', borderWidth: '2px' }}></img>
+                        <img src={(userIconUrl !== '') ? userIconUrl : 'user.png'} alt="user icon" style={{ width: 'auto', height: '80%', borderColor: (isSpeaking ? '#108675' : '#ffffff'), borderStyle: 'solid', borderWidth: '2px' }}></img>
                     </Grid>
                     <Grid item xs={4} style={{ height: '20%' }}></Grid>
                     <Grid item xs={12} style={{ height: '75%' }}>

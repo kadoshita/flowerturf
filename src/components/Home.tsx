@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import DeviceSelect from './DeviceSelect';
 
 import store from '../store/index';
-import { USER_NAME_STORE, ROOM_NAME_STORE } from '../actions/index';
+import { USER_NAME_STORE, ROOM_NAME_STORE, USER_ICON_URL_STORE } from '../actions/index';
 
 const Home = () => {
     const [roomName, setRoomName] = useState('');
@@ -22,10 +22,13 @@ const Home = () => {
                         <p>FlowerTurfは複数人対応、インストール不要のボイスチャットツールです。URLを共有すれば、誰でも参加できます。</p>
                     </Grid>
                     <Grid item xs={12}>
-                        <TextField label="ルーム名" required color="primary" fullWidth onChange={e => { setRoomName(e.target.value); store.dispatch({ type: ROOM_NAME_STORE, name: e.target.value }); }}></TextField>
+                        <TextField label="ルーム名" required color="primary" fullWidth onChange={e => { setRoomName(e.target.value); store.dispatch({ type: ROOM_NAME_STORE, value: e.target.value }); }}></TextField>
                     </Grid>
                     <Grid item xs={12}>
-                        <TextField label="ユーザー名" color="primary" fullWidth onChange={e => store.dispatch({ type: USER_NAME_STORE, name: e.target.value })}></TextField>
+                        <TextField label="ユーザー名" color="primary" fullWidth onChange={e => store.dispatch({ type: USER_NAME_STORE, value: e.target.value })}></TextField>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField label="アイコン画像URL" color="primary" fullWidth onChange={e => store.dispatch({ type: USER_ICON_URL_STORE, value: e.target.value })}></TextField>
                     </Grid>
                     <Grid item xs={12}>
                         <DeviceSelect></DeviceSelect>
