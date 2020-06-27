@@ -35,6 +35,11 @@ const TextChat = (props: TextChatProps) => {
     const chatMessagesCount = props.chatMessages.length - 1;
     const chatMessagesLastItem = useRef<HTMLDivElement>(null);
 
+    const sendChatMessage = () => {
+        props.sendChatMessage(sendMessage);
+        setSendMessage('');
+    };
+
     useEffect(() => {
         if (chatMessagesLastItem) {
             if (chatMessagesLastItem.current) {
@@ -91,10 +96,14 @@ const TextChat = (props: TextChatProps) => {
                 <Divider></Divider>
             </Grid>
             <Grid item xs={10} style={{ height: '9%', paddingRight: '4px' }}>
-                <Input fullWidth value={sendMessage} onChange={e => setSendMessage(e.target.value)}></Input>
+                <Input fullWidth value={sendMessage} onChange={e => setSendMessage(e.target.value)} onKeyDown={e => {
+                    if (e.keyCode === 13) {
+                        sendChatMessage();
+                    }
+                }}></Input>
             </Grid>
             <Grid item xs={2} style={{ height: '9%' }}>
-                <Button fullWidth color='primary' variant='contained' onClick={() => { props.sendChatMessage(sendMessage); setSendMessage('') }}>送信</Button>
+                <Button fullWidth color='primary' variant='contained' onClick={sendChatMessage}>送信</Button>
             </Grid>
         </Grid>
     );
