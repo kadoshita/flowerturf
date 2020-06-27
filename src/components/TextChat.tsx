@@ -24,7 +24,7 @@ const sanitizingAndAutolinkMessage = (message: string) => {
         }), {
         allowedTags: ['a', 'b'],
         allowedAttributes: {
-            'a': ['href']
+            'a': ['href', 'rel', 'target']
         },
         disallowedTagsMode: 'escape'
     })
