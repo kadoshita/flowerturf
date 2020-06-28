@@ -206,6 +206,7 @@ const Chat = () => {
         });
 
         return () => {
+            localAudioStream?.getTracks().forEach(t => t.stop());
             peer.destroy();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
