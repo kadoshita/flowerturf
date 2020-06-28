@@ -254,7 +254,7 @@ const Chat = () => {
                 <p style={{ margin: '0px' }}>ルーム: {roomName}</p>
             </Grid>
             <Grid item xs={1} style={{ height: '5%', paddingTop: '4px' }}>
-                <Fab color='secondary' aria-label='close'>
+                <Fab color='secondary' aria-label='close' onClick={() => window.location.href = window.location.origin}>
                     <Close></Close>
                 </Fab>
             </Grid>
