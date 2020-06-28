@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, TextField } from '@material-ui/core';
+import { Grid, TextField, Fab } from '@material-ui/core';
+import { Close, Mic, MicOff } from '@material-ui/icons';
 import Peer, { RoomStream, MeshRoom } from 'skyway-js';
 import hark from 'hark';
 import { ROOM_NAME_STORE, USER_NAME_STORE } from '../actions/index';
@@ -60,6 +61,8 @@ const Chat = () => {
     const [myId, setMyId] = useState('');
     const [userName, setUserName] = useState(state.username)
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [isMicMute, setIsMicMute] = useState(false);
+    const [localAudioStream, setLocalAudioStream] = useState<MediaStream>();
     const [meshRoom, setMeshRoom] = useState<MeshRoom>();
     const [userList, setUserList] = useState<UserListItem[]>([]);
     const [newChatMessage, setNewChatMessage] = useState<ChatMessage>();
@@ -94,11 +97,11 @@ const Chat = () => {
             setMyId(id);
             setUserName((userName === '') ? id : userName);
             const audioTrackConstraints = getMediaTrackConstraints()
-            const localAudioStream = await navigator.mediaDevices.getUserMedia({
+            const _localAudioStream = await navigator.mediaDevices.getUserMedia({
                 video: false,
                 audio: audioTrackConstraints
             });
-            const speechEvent = hark(localAudioStream, {});
+            const speechEvent = hark(_localAudioStream, {});
             speechEvent.on('speaking', () => {
                 setIsSpeaking(true);
             });
@@ -107,7 +110,7 @@ const Chat = () => {
             });
             const _meshRoom = peer.joinRoom(roomName, {
                 mode: 'mesh',
-                stream: localAudioStream
+                stream: _localAudioStream
             });
             _meshRoom.on('open', () => {
                 console.log(`Join room ${roomName}`);
@@ -198,6 +201,7 @@ const Chat = () => {
                 }
             });
 
+            setLocalAudioStream(_localAudioStream);
             setMeshRoom(_meshRoom as MeshRoom);
         });
 
@@ -236,10 +240,22 @@ const Chat = () => {
         store.dispatch({ type: USER_NAME_STORE, value: sendUserName });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userName]);
+    useEffect(() => {
+        const tracks = localAudioStream?.getAudioTracks();
+        tracks?.forEach(t => t.enabled = !isMicMute);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isMicMute]);
+
+    const micButton = <Fab color={isMicMute ? 'secondary' : 'primary'} aria-label={isMicMute ? 'mic-off' : 'mic'} onClick={() => setIsMicMute(!isMicMute)}>{isMicMute ? <MicOff></MicOff> : <Mic></Mic>}</Fab>;
     return (
         <Grid container style={{ height: '100%' }}>
-            <Grid item xs={12} style={{ height: '5%' }}>
+            <Grid item xs={11} style={{ height: '5%' }}>
                 <p style={{ margin: '0px' }}>ルーム: {roomName}</p>
+            </Grid>
+            <Grid item xs={1} style={{ height: '5%', paddingTop: '4px' }}>
+                <Fab color='secondary' aria-label='close'>
+                    <Close></Close>
+                </Fab>
             </Grid>
             <Grid item xs={4} style={{ height: '95%' }}>
                 <Grid container style={{ height: '100%' }}>
@@ -254,7 +270,9 @@ const Chat = () => {
                     <Grid item xs={4} style={{ height: '20%' }}>
                         <img src={(userIconUrl !== '') ? userIconUrl : 'user.png'} alt="user icon" style={{ width: 'auto', height: '80%', borderColor: (isSpeaking ? '#108675' : '#ffffff'), borderStyle: 'solid', borderWidth: '2px' }}></img>
                     </Grid>
-                    <Grid item xs={4} style={{ height: '20%' }}></Grid>
+                    <Grid item xs={4} style={{ height: '20%', textAlign: 'left', verticalAlign: 'bottom' }}>
+                        {micButton}
+                    </Grid>
                     <Grid item xs={12} style={{ height: '75%' }}>
                         <TextChat chatMessages={chatMessages} sendChatMessage={sendChatMessage}></TextChat>
                     </Grid>

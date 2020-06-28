@@ -17,7 +17,6 @@ const Home = () => {
                 </Grid>
                 <Grid item xs={12} style={{ height: '20%' }}></Grid>
                 <Grid item xs={6} style={{ height: '70%' }}>
-                    <Grid item xs={12} style={{ height: '15%' }}></Grid>
                     <Grid item xs={12}>
                         <p>FlowerTurfは複数人対応、インストール不要のボイスチャットツールです。URLを共有すれば、誰でも参加できます。</p>
                     </Grid>
