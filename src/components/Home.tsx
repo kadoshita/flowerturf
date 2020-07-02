@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Grid, TextField, Button, Paper } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import DeviceSelect from './DeviceSelect';
@@ -8,6 +8,23 @@ import { USER_NAME_STORE, ROOM_NAME_STORE, USER_ICON_URL_STORE } from '../action
 
 const Home = () => {
     const [roomName, setRoomName] = useState('');
+    const [iconUrl, setIconUrl] = useState('');
+    const [iconUrlExist, setIconUrlExist] = useState(false);
+
+    useEffect(() => {
+        fetch(iconUrl).then(res => {
+            if (res.ok) {
+                store.dispatch({ type: USER_ICON_URL_STORE, value: iconUrl });
+                setIconUrlExist(true);
+            } else {
+                console.warn('icon url is not exist');
+                setIconUrlExist(false);
+            }
+        }).catch(e => {
+            console.warn('icon url is not exist');
+            setIconUrlExist(false);
+        });
+    }, [iconUrl]);
 
     return (
         <Container style={{ height: '100%' }}>
@@ -27,7 +44,7 @@ const Home = () => {
                         <TextField label="ユーザー名" color="primary" fullWidth onChange={e => store.dispatch({ type: USER_NAME_STORE, value: e.target.value })}></TextField>
                     </Grid>
                     <Grid item xs={12}>
-                        <TextField label="アイコン画像URL" color="primary" fullWidth onChange={e => store.dispatch({ type: USER_ICON_URL_STORE, value: e.target.value })}></TextField>
+                        <TextField label="アイコン画像URL" color="primary" fullWidth error={!iconUrlExist} onChange={e => setIconUrl(e.target.value)}></TextField>
                     </Grid>
                     <Grid item xs={12}>
                         <DeviceSelect></DeviceSelect>
