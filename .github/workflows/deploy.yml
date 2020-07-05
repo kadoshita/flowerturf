@@ -15,6 +15,8 @@ jobs:
       run: yarn install
     - name: set SkyWay API Key
       run: echo "REACT_APP_SKYWAY_API_KEY=${{ secrets.SKYWAY_API_KEY }}" > .env
+    - name: set Rating API URL
+      run: echo "REACT_APP_RATING_API_URL=${{ secrets.RATING_API_URL }}" >> .env
     - name: yarn build
       run: yarn build
     - name: deploy to Netlify

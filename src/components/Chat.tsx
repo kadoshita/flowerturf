@@ -6,6 +6,7 @@ import hark from 'hark';
 import { ROOM_NAME_STORE, USER_NAME_STORE } from '../actions/index';
 import User from './User';
 import TextChat from './TextChat';
+import RatingDialog from './RatingDialog';
 
 import store from '../store/index';
 import deviceStore from '../store/device';
@@ -62,6 +63,7 @@ const Chat = () => {
     const [userName, setUserName] = useState(state.username)
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isMicMute, setIsMicMute] = useState(false);
+    const [isRatingDialogOpen, setIsRatingDialogOpen] = useState(false);
     const [localAudioStream, setLocalAudioStream] = useState<MediaStream>();
     const [meshRoom, setMeshRoom] = useState<MeshRoom>();
     const [userList, setUserList] = useState<UserListItem[]>([]);
@@ -254,9 +256,10 @@ const Chat = () => {
                 <p style={{ margin: '0px' }}>ルーム: {roomName}</p>
             </Grid>
             <Grid item xs={1} style={{ height: '5%', paddingTop: '4px' }}>
-                <Fab color='secondary' aria-label='close' onClick={() => window.location.href = window.location.origin}>
+                <Fab color='secondary' aria-label='close' onClick={() => setIsRatingDialogOpen(true)}>
                     <Close></Close>
                 </Fab>
+                <RatingDialog isOpen={isRatingDialogOpen} toggleOpen={() => { setIsRatingDialogOpen(!isRatingDialogOpen); window.location.href = window.location.origin }}></RatingDialog>
             </Grid>
             <Grid item xs={4} style={{ height: '95%' }}>
                 <Grid container style={{ height: '100%' }}>
