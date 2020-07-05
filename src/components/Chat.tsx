@@ -60,10 +60,11 @@ const getMediaTrackConstraints = (): MediaTrackConstraints => {
 const Chat = () => {
     const state = store.getState();
     const [myId, setMyId] = useState('');
-    const [userName, setUserName] = useState(state.username)
+    const [userName, setUserName] = useState(state.username);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isMicMute, setIsMicMute] = useState(false);
     const [isRatingDialogOpen, setIsRatingDialogOpen] = useState(false);
+    const [sessionStartTime, setSessionStartTime] = useState<number>(0);
     const [localAudioStream, setLocalAudioStream] = useState<MediaStream>();
     const [meshRoom, setMeshRoom] = useState<MeshRoom>();
     const [userList, setUserList] = useState<UserListItem[]>([]);
@@ -96,6 +97,7 @@ const Chat = () => {
         });
         peer.on('open', async id => {
             console.log(`Conenction established between SkyWay Server!! My ID is ${id}`);
+            setSessionStartTime((new Date()).getTime());
             setMyId(id);
             setUserName((userName === '') ? id : userName);
             const audioTrackConstraints = getMediaTrackConstraints()
@@ -259,7 +261,7 @@ const Chat = () => {
                 <Fab color='secondary' aria-label='close' onClick={() => setIsRatingDialogOpen(true)}>
                     <Close></Close>
                 </Fab>
-                <RatingDialog isOpen={isRatingDialogOpen} toggleOpen={() => { setIsRatingDialogOpen(!isRatingDialogOpen); window.location.href = window.location.origin }}></RatingDialog>
+                <RatingDialog isOpen={isRatingDialogOpen} sessionDuration={(new Date()).getTime() - sessionStartTime} toggleOpen={() => { setIsRatingDialogOpen(!isRatingDialogOpen); window.location.href = window.location.origin }}></RatingDialog>
             </Grid>
             <Grid item xs={4} style={{ height: '95%' }}>
                 <Grid container style={{ height: '100%' }}>

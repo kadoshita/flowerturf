@@ -4,6 +4,7 @@ import { Rating } from '@material-ui/lab';
 
 type RatingDialogProps = {
     isOpen: boolean,
+    sessionDuration: number,
     toggleOpen: Function
 };
 const RatingDialog = (props: RatingDialogProps) => {
@@ -11,21 +12,26 @@ const RatingDialog = (props: RatingDialogProps) => {
     const [message, setMessage] = useState('');
 
     const handleClick = async (isSubmit: boolean) => {
+        let submitData;
         if (isSubmit) {
-            const submitData = {
+            submitData = {
                 rating: ratingValue,
-                session_duration: 0,
+                session_duration: props.sessionDuration / 1000,
                 message: message
-            }
-            await fetch(process.env.REACT_APP_RATING_API_URL || '', {
-                body: JSON.stringify(submitData),
-                mode: 'no-cors',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json; charset=utf-8',
-                }
-            });
+            };
+        } else {
+            submitData = {
+                session_duration: props.sessionDuration / 1000
+            };
         }
+        await fetch(process.env.REACT_APP_RATING_API_URL || '', {
+            body: JSON.stringify(submitData),
+            mode: 'no-cors',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+            }
+        });
         props.toggleOpen();
     }
     return (
