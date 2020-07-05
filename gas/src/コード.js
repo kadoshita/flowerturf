@@ -4,6 +4,9 @@ function doPost(e) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheets()[0];
 
-  sheet.appendRow(['data', e]);
+  var req = JSON.parse(e.postData.contents);
+  var date = new Date();
+
+  sheet.appendRow([date.getFullYear(), date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds(), req.ratings, req.session_duration, req.message]);
   return ContentService.createTextOutput('OK');
 }
