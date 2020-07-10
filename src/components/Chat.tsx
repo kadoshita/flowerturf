@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, TextField, Fab } from '@material-ui/core';
-import { Close, Mic, MicOff } from '@material-ui/icons';
+import { Close, Mic, MicOff, DesktopAccessDisabled, DesktopWindows } from '@material-ui/icons';
 import Peer, { RoomStream, MeshRoom } from 'skyway-js';
 import hark from 'hark';
 import { ROOM_NAME_STORE, USER_NAME_STORE } from '../actions/index';
@@ -63,6 +63,7 @@ const Chat = () => {
     const [userName, setUserName] = useState(state.username);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isMicMute, setIsMicMute] = useState(false);
+    const [isScreenSharing, setIsScreenSharing] = useState(false);
     const [isRatingDialogOpen, setIsRatingDialogOpen] = useState(false);
     const [sessionStartTime, setSessionStartTime] = useState<number>(0);
     const [localAudioStream, setLocalAudioStream] = useState<MediaStream>();
@@ -252,6 +253,7 @@ const Chat = () => {
     }, [isMicMute]);
 
     const micButton = <Fab color={isMicMute ? 'secondary' : 'primary'} aria-label={isMicMute ? 'mic-off' : 'mic'} onClick={() => setIsMicMute(!isMicMute)}>{isMicMute ? <MicOff></MicOff> : <Mic></Mic>}</Fab>;
+    const screenShareButton = <Fab color={isScreenSharing ? 'secondary' : 'primary'} aria-label={isScreenSharing ? 'desktop-access-disabled' : 'desktop-windows'} onClick={() => setIsScreenSharing(!isScreenSharing)}>{isScreenSharing ? <DesktopAccessDisabled></DesktopAccessDisabled> : <DesktopWindows></DesktopWindows>}</Fab>;
     return (
         <Grid container style={{ height: '100%' }}>
             <Grid item xs={11} style={{ height: '5%' }}>
@@ -276,8 +278,11 @@ const Chat = () => {
                     <Grid item xs={4} style={{ height: '20%' }}>
                         <img src={(userIconUrl !== '') ? userIconUrl : 'user.png'} alt="user icon" style={{ width: 'auto', height: '80%', borderColor: (isSpeaking ? '#108675' : '#ffffff'), borderStyle: 'solid', borderWidth: '2px' }}></img>
                     </Grid>
-                    <Grid item xs={4} style={{ height: '20%', textAlign: 'left', verticalAlign: 'bottom' }}>
+                    <Grid item xs={2} style={{ height: '20%', textAlign: 'center' }}>
                         {micButton}
+                    </Grid>
+                    <Grid item xs={2} style={{ height: '20%', textAlign: 'center' }}>
+                        {screenShareButton}
                     </Grid>
                     <Grid item xs={12} style={{ height: '75%' }}>
                         <TextChat chatMessages={chatMessages} sendChatMessage={sendChatMessage}></TextChat>
