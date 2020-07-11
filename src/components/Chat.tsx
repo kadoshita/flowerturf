@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Grid, TextField, Fab } from '@material-ui/core';
 import { Close, Mic, MicOff, DesktopAccessDisabled, DesktopWindows } from '@material-ui/icons';
 import Peer, { RoomStream, MeshRoom } from 'skyway-js';
@@ -67,10 +67,12 @@ const Chat = () => {
     const [isRatingDialogOpen, setIsRatingDialogOpen] = useState(false);
     const [sessionStartTime, setSessionStartTime] = useState<number>(0);
     const [localAudioStream, setLocalAudioStream] = useState<MediaStream>();
+    const [screenStream, setScreenStream] = useState<MediaStream | null>();
     const [meshRoom, setMeshRoom] = useState<MeshRoom>();
     const [userList, setUserList] = useState<UserListItem[]>([]);
     const [newChatMessage, setNewChatMessage] = useState<ChatMessage>();
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+    const screenRef = useRef<HTMLVideoElement>(null);
     const parameters = parseQueryParameter(window.location.search.replace('?', ''));
     const roomName = (state.roomname === '') ? parameters.room : state.roomname;
     const userIconUrl = state.usericon;
@@ -251,9 +253,43 @@ const Chat = () => {
         tracks?.forEach(t => t.enabled = !isMicMute);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isMicMute]);
+    useEffect(() => {
+        const startScreenShare = async () => {
+            const mediaDevices = navigator.mediaDevices as any;
+            const _screenStream: MediaStream = await mediaDevices.getDisplayMedia();
+            _screenStream.getTracks().forEach(t => {
+                t.onended = () => {
+                    setIsScreenSharing(!isScreenSharing);
+                }
+            });
+            setScreenStream(_screenStream);
+            const $screen = screenRef.current;
+            if ($screen && _screenStream) {
+                $screen.srcObject = _screenStream;
+                const videoWidth = $screen.offsetWidth;
+                $screen.style.height = `${((9 / 16) * videoWidth)}px`;
+            }
+        };
+        const stopScreenShare = () => {
+            screenStream?.getTracks().forEach(t => t.stop());
+            setScreenStream(null);
+            const $screen = screenRef.current;
+            if ($screen) {
+                $screen.pause();
+                $screen.srcObject = null;
+            }
+        }
+        if (isScreenSharing) {
+            startScreenShare();
+        } else {
+            stopScreenShare();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isScreenSharing]);
 
     const micButton = <Fab color={isMicMute ? 'secondary' : 'primary'} aria-label={isMicMute ? 'mic-off' : 'mic'} onClick={() => setIsMicMute(!isMicMute)}>{isMicMute ? <MicOff></MicOff> : <Mic></Mic>}</Fab>;
     const screenShareButton = <Fab color={isScreenSharing ? 'secondary' : 'primary'} aria-label={isScreenSharing ? 'desktop-access-disabled' : 'desktop-windows'} onClick={() => setIsScreenSharing(!isScreenSharing)}>{isScreenSharing ? <DesktopAccessDisabled></DesktopAccessDisabled> : <DesktopWindows></DesktopWindows>}</Fab>;
+    const screenVideo = (screenStream) ? <video ref={screenRef} autoPlay style={{ width: '100%', marginTop: '20px' }}></video> : <></>;
     return (
         <Grid container style={{ height: '100%' }}>
             <Grid item xs={11} style={{ height: '5%' }}>
@@ -291,6 +327,9 @@ const Chat = () => {
             </Grid>
             <Grid item xs={8} style={{ height: '95%' }}>
                 <Grid container>
+                    <Grid item xs={12}>
+                        {screenVideo}
+                    </Grid>
                     {userList.map((u, i) => <Grid item xs={2} key={i}><User name={u.name || u.id} icon={u.icon} stream={u.stream} isSpeaking={u.isSpeaking}></User></Grid>)}
                 </Grid>
             </Grid>
