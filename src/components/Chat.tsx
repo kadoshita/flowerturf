@@ -69,6 +69,8 @@ const Chat = () => {
     const [localAudioStream, setLocalAudioStream] = useState<MediaStream>();
     const [screenStream, setScreenStream] = useState<MediaStream | null>();
     const [meshRoom, setMeshRoom] = useState<MeshRoom>();
+    const [screenSharePeer, setScreenSharePeer] = useState<Peer | null>();
+    const [screenShareConnection, setScreenShareConnection] = useState<MeshRoom | null>();
     const [userList, setUserList] = useState<UserListItem[]>([]);
     const [newChatMessage, setNewChatMessage] = useState<ChatMessage>();
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -130,8 +132,8 @@ const Chat = () => {
                 }
             });
 
-            _meshRoom.on('peerJoin', () => {
-                if (userName !== '') {
+            _meshRoom.on('peerJoin', peerId => {
+                if (userName !== '' && peerId !== `${roomName}-screen`) {
                     _meshRoom.send({
                         type: ActionType.NOTICE_NAME,
                         name: userName,
@@ -141,32 +143,42 @@ const Chat = () => {
             });
             _meshRoom.on('peerLeave', peerId => {
                 console.log(`User ${peerId} leave`);
-                setUserList(currentUserList => {
-                    const newUserList = [...currentUserList];
-                    const leaveUserIndex = newUserList.findIndex(s => s.id === peerId);
-                    newUserList.splice(leaveUserIndex, 1);
-                    return newUserList;
-                });
+                if (peerId !== `${roomName}-screen`) {
+                    setUserList(currentUserList => {
+                        const newUserList = [...currentUserList];
+                        const leaveUserIndex = newUserList.findIndex(s => s.id === peerId);
+                        newUserList.splice(leaveUserIndex, 1);
+                        return newUserList;
+                    });
+                } else {
+                    screenStream?.getTracks().forEach(t => t.stop());
+                    setScreenStream(null);
+                }
             });
 
             _meshRoom.on('stream', stream => {
                 console.log(`User ${stream.peerId} streaming start`);
-                setUserList(currentUserList => {
-                    const newUserList = [...currentUserList];
-                    const streamStartUserIndex = newUserList.findIndex(u => u.id === stream.peerId);
-                    if (streamStartUserIndex === -1) {
-                        newUserList.push({
-                            id: stream.peerId,
-                            name: '',
-                            icon: 'user.png',
-                            stream: stream,
-                            isSpeaking: false
-                        });
-                    } else {
-                        newUserList[streamStartUserIndex].stream = stream;
-                    }
-                    return newUserList;
-                });
+                if (stream.peerId !== `${roomName}-screen`) {
+                    setUserList(currentUserList => {
+                        const newUserList = [...currentUserList];
+                        const streamStartUserIndex = newUserList.findIndex(u => u.id === stream.peerId);
+                        if (streamStartUserIndex === -1) {
+                            newUserList.push({
+                                id: stream.peerId,
+                                name: '',
+                                icon: 'user.png',
+                                stream: stream,
+                                isSpeaking: false
+                            });
+                        } else {
+                            newUserList[streamStartUserIndex].stream = stream;
+                        }
+                        return newUserList;
+                    });
+                } else {
+                    setScreenStream(stream);
+                }
+
             });
             _meshRoom.on('data', data => {
                 switch (data.data.type) {
@@ -262,22 +274,30 @@ const Chat = () => {
                     setIsScreenSharing(!isScreenSharing);
                 }
             });
+            const apiKey = process.env.REACT_APP_SKYWAY_API_KEY || '';
+            const peer = new Peer(`${roomName}-screen`, {
+                key: apiKey
+            });
+            peer.on('open', () => {
+                const room = peer.joinRoom(roomName, {
+                    mode: 'mesh',
+                    stream: _screenStream,
+                    audioReceiveEnabled: false,
+                    videoReceiveEnabled: false
+                });
+                setScreenShareConnection(room as MeshRoom);
+            });
             setScreenStream(_screenStream);
-            const $screen = screenRef.current;
-            if ($screen && _screenStream) {
-                $screen.srcObject = _screenStream;
-                const videoWidth = $screen.offsetWidth;
-                $screen.style.height = `${((9 / 16) * videoWidth)}px`;
-            }
+            setScreenSharePeer(peer);
         };
         const stopScreenShare = () => {
             screenStream?.getTracks().forEach(t => t.stop());
+            screenShareConnection?.close();
+            screenSharePeer?.destroy();
+            screenSharePeer?.disconnect();
             setScreenStream(null);
-            const $screen = screenRef.current;
-            if ($screen) {
-                $screen.pause();
-                $screen.srcObject = null;
-            }
+            setScreenShareConnection(null);
+            setScreenSharePeer(null);
         }
         if (isScreenSharing) {
             startScreenShare();
@@ -286,6 +306,22 @@ const Chat = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isScreenSharing]);
+    useEffect(() => {
+        if (screenStream) {
+            const $screen = screenRef.current;
+            if ($screen && $screen.srcObject === null) {
+                $screen.srcObject = screenStream;
+                const videoWidth = $screen.offsetWidth;
+                $screen.style.height = `${((9 / 16) * videoWidth)}px`;
+            }
+        } else {
+            const $screen = screenRef.current;
+            if ($screen) {
+                $screen.pause();
+                $screen.srcObject = null;
+            }
+        }
+    }, [screenStream]);
 
     const micButton = <Fab color={isMicMute ? 'secondary' : 'primary'} aria-label={isMicMute ? 'mic-off' : 'mic'} onClick={() => setIsMicMute(!isMicMute)}>{isMicMute ? <MicOff></MicOff> : <Mic></Mic>}</Fab>;
     const screenShareButton = <Fab color={isScreenSharing ? 'secondary' : 'primary'} aria-label={isScreenSharing ? 'desktop-access-disabled' : 'desktop-windows'} onClick={() => setIsScreenSharing(!isScreenSharing)}>{isScreenSharing ? <DesktopAccessDisabled></DesktopAccessDisabled> : <DesktopWindows></DesktopWindows>}</Fab>;
