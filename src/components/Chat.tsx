@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Grid, TextField, Fab } from '@material-ui/core';
-import { Close, Mic, MicOff, DesktopAccessDisabled, DesktopWindows } from '@material-ui/icons';
+import { Close, Mic, MicOff } from '@material-ui/icons';
 import Peer, { RoomStream, MeshRoom } from 'skyway-js';
 import hark from 'hark';
 import { ROOM_NAME_STORE, USER_NAME_STORE } from '../actions/index';
@@ -63,18 +63,13 @@ const Chat = () => {
     const [userName, setUserName] = useState(state.username);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isMicMute, setIsMicMute] = useState(false);
-    const [isScreenSharing, setIsScreenSharing] = useState(false);
     const [isRatingDialogOpen, setIsRatingDialogOpen] = useState(false);
     const [sessionStartTime, setSessionStartTime] = useState<number>(0);
     const [localAudioStream, setLocalAudioStream] = useState<MediaStream>();
-    const [screenStream, setScreenStream] = useState<MediaStream | null>();
     const [meshRoom, setMeshRoom] = useState<MeshRoom>();
-    const [screenSharePeer, setScreenSharePeer] = useState<Peer | null>();
-    const [screenShareConnection, setScreenShareConnection] = useState<MeshRoom | null>();
     const [userList, setUserList] = useState<UserListItem[]>([]);
     const [newChatMessage, setNewChatMessage] = useState<ChatMessage>();
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-    const screenRef = useRef<HTMLVideoElement>(null);
     const parameters = parseQueryParameter(window.location.search.replace('?', ''));
     const roomName = (state.roomname === '') ? parameters.room : state.roomname;
     const userIconUrl = state.usericon;
@@ -132,52 +127,41 @@ const Chat = () => {
                 }
             });
 
-            _meshRoom.on('peerJoin', peerId => {
-                if (userName !== '' && peerId !== `${roomName}-screen`) {
-                    _meshRoom.send({
-                        type: ActionType.NOTICE_NAME,
-                        name: userName,
-                        icon: userIconUrl
-                    });
-                }
+            _meshRoom.on('peerJoin', () => {
+                _meshRoom.send({
+                    type: ActionType.NOTICE_NAME,
+                    name: userName,
+                    icon: userIconUrl
+                });
             });
             _meshRoom.on('peerLeave', peerId => {
                 console.log(`User ${peerId} leave`);
-                if (peerId !== `${roomName}-screen`) {
-                    setUserList(currentUserList => {
-                        const newUserList = [...currentUserList];
-                        const leaveUserIndex = newUserList.findIndex(s => s.id === peerId);
-                        newUserList.splice(leaveUserIndex, 1);
-                        return newUserList;
-                    });
-                } else {
-                    screenStream?.getTracks().forEach(t => t.stop());
-                    setScreenStream(null);
-                }
+                setUserList(currentUserList => {
+                    const newUserList = [...currentUserList];
+                    const leaveUserIndex = newUserList.findIndex(s => s.id === peerId);
+                    newUserList.splice(leaveUserIndex, 1);
+                    return newUserList;
+                });
             });
 
             _meshRoom.on('stream', stream => {
                 console.log(`User ${stream.peerId} streaming start`);
-                if (stream.peerId !== `${roomName}-screen`) {
-                    setUserList(currentUserList => {
-                        const newUserList = [...currentUserList];
-                        const streamStartUserIndex = newUserList.findIndex(u => u.id === stream.peerId);
-                        if (streamStartUserIndex === -1) {
-                            newUserList.push({
-                                id: stream.peerId,
-                                name: '',
-                                icon: 'user.png',
-                                stream: stream,
-                                isSpeaking: false
-                            });
-                        } else {
-                            newUserList[streamStartUserIndex].stream = stream;
-                        }
-                        return newUserList;
-                    });
-                } else {
-                    setScreenStream(stream);
-                }
+                setUserList(currentUserList => {
+                    const newUserList = [...currentUserList];
+                    const streamStartUserIndex = newUserList.findIndex(u => u.id === stream.peerId);
+                    if (streamStartUserIndex === -1) {
+                        newUserList.push({
+                            id: stream.peerId,
+                            name: '',
+                            icon: 'user.png',
+                            stream: stream,
+                            isSpeaking: false
+                        });
+                    } else {
+                        newUserList[streamStartUserIndex].stream = stream;
+                    }
+                    return newUserList;
+                });
 
             });
             _meshRoom.on('data', data => {
@@ -265,67 +249,8 @@ const Chat = () => {
         tracks?.forEach(t => t.enabled = !isMicMute);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isMicMute]);
-    useEffect(() => {
-        const startScreenShare = async () => {
-            const mediaDevices = navigator.mediaDevices as any;
-            const _screenStream: MediaStream = await mediaDevices.getDisplayMedia();
-            _screenStream.getTracks().forEach(t => {
-                t.onended = () => {
-                    setIsScreenSharing(!isScreenSharing);
-                }
-            });
-            const apiKey = process.env.REACT_APP_SKYWAY_API_KEY || '';
-            const peer = new Peer(`${roomName}-screen`, {
-                key: apiKey
-            });
-            peer.on('open', () => {
-                const room = peer.joinRoom(roomName, {
-                    mode: 'mesh',
-                    stream: _screenStream,
-                    audioReceiveEnabled: false,
-                    videoReceiveEnabled: false
-                });
-                setScreenShareConnection(room as MeshRoom);
-            });
-            setScreenStream(_screenStream);
-            setScreenSharePeer(peer);
-        };
-        const stopScreenShare = () => {
-            screenStream?.getTracks().forEach(t => t.stop());
-            screenShareConnection?.close();
-            screenSharePeer?.destroy();
-            screenSharePeer?.disconnect();
-            setScreenStream(null);
-            setScreenShareConnection(null);
-            setScreenSharePeer(null);
-        }
-        if (isScreenSharing) {
-            startScreenShare();
-        } else {
-            stopScreenShare();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isScreenSharing]);
-    useEffect(() => {
-        if (screenStream) {
-            const $screen = screenRef.current;
-            if ($screen && $screen.srcObject === null) {
-                $screen.srcObject = screenStream;
-                const videoWidth = $screen.offsetWidth;
-                $screen.style.height = `${((9 / 16) * videoWidth)}px`;
-            }
-        } else {
-            const $screen = screenRef.current;
-            if ($screen) {
-                $screen.pause();
-                $screen.srcObject = null;
-            }
-        }
-    }, [screenStream]);
 
     const micButton = <Fab color={isMicMute ? 'secondary' : 'primary'} aria-label={isMicMute ? 'mic-off' : 'mic'} onClick={() => setIsMicMute(!isMicMute)}>{isMicMute ? <MicOff></MicOff> : <Mic></Mic>}</Fab>;
-    const screenShareButton = <Fab color={isScreenSharing ? 'secondary' : 'primary'} aria-label={isScreenSharing ? 'desktop-access-disabled' : 'desktop-windows'} onClick={() => setIsScreenSharing(!isScreenSharing)}>{isScreenSharing ? <DesktopAccessDisabled></DesktopAccessDisabled> : <DesktopWindows></DesktopWindows>}</Fab>;
-    const screenVideo = (screenStream) ? <video ref={screenRef} autoPlay style={{ width: '100%', marginTop: '20px' }}></video> : <></>;
     return (
         <Grid container style={{ height: '100%' }}>
             <Grid item xs={11} style={{ height: '5%' }}>
@@ -353,9 +278,6 @@ const Chat = () => {
                     <Grid item xs={2} style={{ height: '20%', textAlign: 'center' }}>
                         {micButton}
                     </Grid>
-                    <Grid item xs={2} style={{ height: '20%', textAlign: 'center' }}>
-                        {screenShareButton}
-                    </Grid>
                     <Grid item xs={12} style={{ height: '75%' }}>
                         <TextChat chatMessages={chatMessages} sendChatMessage={sendChatMessage}></TextChat>
                     </Grid>
@@ -363,9 +285,6 @@ const Chat = () => {
             </Grid>
             <Grid item xs={8} style={{ height: '95%' }}>
                 <Grid container>
-                    <Grid item xs={12}>
-                        {screenVideo}
-                    </Grid>
                     {userList.map((u, i) => <Grid item xs={2} key={i}><User name={u.name || u.id} icon={u.icon} stream={u.stream} isSpeaking={u.isSpeaking}></User></Grid>)}
                 </Grid>
             </Grid>
