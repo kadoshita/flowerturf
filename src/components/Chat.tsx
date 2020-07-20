@@ -3,10 +3,12 @@ import { Grid, TextField, Fab } from '@material-ui/core';
 import { Close, Mic, MicOff, ScreenShare } from '@material-ui/icons';
 import Peer, { RoomStream, MeshRoom } from 'skyway-js';
 import hark from 'hark';
+import getYoutubeId from 'get-youtube-id';
 import { ROOM_NAME_STORE, USER_NAME_STORE } from '../actions/index';
 import User from './User';
 import TextChat from './TextChat';
 import RatingDialog from './RatingDialog';
+import YoutubeView from './YoutubeView';
 
 import store from '../store/index';
 import deviceStore from '../store/device';
@@ -63,6 +65,7 @@ const Chat = () => {
     const [userName, setUserName] = useState(state.username);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isMicMute, setIsMicMute] = useState(false);
+    const [youtubeVideoId, setYoutubeVideoId] = useState('');
     const [isRatingDialogOpen, setIsRatingDialogOpen] = useState(false);
     const [sessionStartTime, setSessionStartTime] = useState<number>(0);
     const [localAudioStream, setLocalAudioStream] = useState<MediaStream>();
@@ -227,6 +230,12 @@ const Chat = () => {
     }, [roomName]);
     useEffect(() => {
         if (newChatMessage) {
+            const getYoutubeIdResult = getYoutubeId(newChatMessage.message);
+            if (getYoutubeIdResult) {
+                setYoutubeVideoId(getYoutubeIdResult);
+            } else {
+                setYoutubeVideoId('');
+            }
             setChatMessages(prevChatMessages => {
                 const newChatMessages = [...prevChatMessages];
                 const sendMessageUserName = userList.find(u => u.id === newChatMessage.user)?.name;
@@ -267,6 +276,7 @@ const Chat = () => {
                 $screen.srcObject = screenStream;
                 const videoWidth = $screen.offsetWidth;
                 $screen.style.height = `${((9 / 16) * videoWidth)}px`;
+                setYoutubeVideoId('');
             }
         } else {
             const $screen = screenRef.current;
@@ -279,6 +289,7 @@ const Chat = () => {
 
     const micButton = <Fab color={isMicMute ? 'secondary' : 'primary'} aria-label={isMicMute ? 'mic-off' : 'mic'} onClick={() => setIsMicMute(!isMicMute)}>{isMicMute ? <MicOff></MicOff> : <Mic></Mic>}</Fab>;
     const screenVideo = (screenStream) ? <video ref={screenRef} autoPlay style={{ width: '100%', marginTop: '20px' }}></video> : <></>;
+    const youtube = (youtubeVideoId && !screenStream) ? <YoutubeView videoId={youtubeVideoId}></YoutubeView> : <></>;
 
     return (
         <Grid container style={{ height: '100%' }}>
@@ -321,6 +332,9 @@ const Chat = () => {
                 <Grid container>
                     <Grid item xs={12}>
                         {screenVideo}
+                    </Grid>
+                    <Grid item xs={12}>
+                        {youtube}
                     </Grid>
                     {userList.map((u, i) => <Grid item xs={2} key={i}><User name={u.name || u.id} icon={u.icon} stream={u.stream} isSpeaking={u.isSpeaking}></User></Grid>)}
                 </Grid>
