@@ -4,6 +4,8 @@ import { Close, Mic, MicOff, ScreenShare } from '@material-ui/icons';
 import Peer, { RoomStream, MeshRoom } from 'skyway-js';
 import hark from 'hark';
 import getYoutubeId from 'get-youtube-id';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { ROOM_NAME_STORE, USER_NAME_STORE } from '../actions/index';
 import User from './User';
 import TextChat from './TextChat';
@@ -134,6 +136,7 @@ const Chat = () => {
 
             _meshRoom.on('peerJoin', peerId => {
                 if (peerId !== `${roomName}-screen`) {
+                    toast('新規参加者が入室しました');
                     _meshRoom.send({
                         type: ActionType.NOTICE_NAME,
                         name: userName,
@@ -339,6 +342,10 @@ const Chat = () => {
                     {userList.map((u, i) => <Grid item xs={2} key={i}><User name={u.name || u.id} icon={u.icon} stream={u.stream} isSpeaking={u.isSpeaking}></User></Grid>)}
                 </Grid>
             </Grid>
+            <ToastContainer
+                position='bottom-right'
+                hideProgressBar
+            ></ToastContainer>
         </Grid >
     )
 };
