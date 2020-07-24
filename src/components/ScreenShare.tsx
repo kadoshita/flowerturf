@@ -48,14 +48,14 @@ const ScreenShare = () => {
                 key: apiKey
             });
             _peer.on('open', () => {
-                const _meshRoom = _peer.joinRoom(roomName, {
+                const _meshRoom: MeshRoom = _peer.joinRoom(roomName, {
                     mode: 'mesh',
                     stream: _screenStream
                 });
                 _meshRoom.on('open', () => {
                     console.log(`Join room ${roomName}`);
                 });
-                setMeshRoom(_meshRoom as MeshRoom);
+                setMeshRoom(_meshRoom);
             });
             setPeer(_peer);
             setScreenStream(_screenStream);

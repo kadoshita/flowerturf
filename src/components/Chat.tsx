@@ -119,7 +119,7 @@ const Chat = () => {
             speechEvent.on('stopped_speaking', () => {
                 setIsSpeaking(false);
             });
-            const _meshRoom = peer.joinRoom(roomName, {
+            const _meshRoom: MeshRoom = peer.joinRoom(roomName, {
                 mode: 'mesh',
                 stream: _localAudioStream
             });
@@ -222,7 +222,7 @@ const Chat = () => {
             });
 
             setLocalAudioStream(_localAudioStream);
-            setMeshRoom(_meshRoom as MeshRoom);
+            setMeshRoom(_meshRoom);
         });
 
         return () => {
