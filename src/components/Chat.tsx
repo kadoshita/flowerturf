@@ -136,6 +136,8 @@ const Chat = () => {
 
             _meshRoom.on('peerJoin', peerId => {
                 if (peerId !== `${roomName}-screen`) {
+                    const sound = new Audio('sound.mp3');
+                    sound.play();
                     toast('新規参加者が入室しました');
                     _meshRoom.send({
                         type: ActionType.NOTICE_NAME,
