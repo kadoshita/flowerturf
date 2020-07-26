@@ -9861,10 +9861,10 @@ sisteransi@^1.0.4:
   resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.5.tgz#134d681297756437cc05ca01370d3a7a571075ed"
   integrity sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==
 
-skyway-js@^2.0.5:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/skyway-js/-/skyway-js-2.0.5.tgz#bf1a7715fb293dee34a9760f6a9ef13d0e2d86ec"
-  integrity sha512-dmMxr6tsZmrm9LcVHlWL2tr+zsw2g91plW29lh2Jl+AILQuIlbJfKj3YTnwtnn8cIcnKJxfN7hjSYB/51GMdRw==
+skyway-js@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/skyway-js/-/skyway-js-3.0.2.tgz#61e479b2c8b5cd72008c5f27035a6e0a5d4eef29"
+  integrity sha512-Mu7Mb09BR171uc8ULjy8Qt1cjagmDVyPB86pq62IFyXAZSkPdbRp59M1AOvIuw4WgLGxVI2/vE6RDyxLIMow9g==
   dependencies:
     "@types/node" "^12.6.8"
     detect-browser "^4.6.0"
@@ -9876,6 +9876,7 @@ skyway-js@^2.0.5:
     sdp-interop "^0.1.13"
     sdp-transform "^2.11.0"
     socket.io-client "^2.2.0"
+    socket.io-parser "~3.3.0"
 
 slash@^1.0.0:
   version "1.0.0"

@@ -25,7 +25,7 @@
     "react-youtube": "^7.11.2",
     "redux": "^4.0.5",
     "sanitize-html": "^1.27.0",
-    "skyway-js": "^2.0.5",
+    "skyway-js": "^3.0.2",
     "typescript": "~3.7.2"
   },
   "scripts": {
