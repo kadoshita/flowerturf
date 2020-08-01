@@ -1,11 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 import { Grid } from '@material-ui/core';
-import { RoomStream } from 'skyway-js';
 
 type UserProps = {
     name: string,
     icon: string,
-    stream?: RoomStream,
+    stream: MediaStream | null,
     isSpeaking: boolean
 };
 const User = (props: UserProps) => {

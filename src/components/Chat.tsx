@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Grid, TextField, Fab } from '@material-ui/core';
-import { Close, Mic, MicOff, ScreenShare } from '@material-ui/icons';
-import Peer, { RoomStream, MeshRoom } from 'skyway-js';
+import { Close, Mic, MicOff, ScreenShare, StopScreenShare } from '@material-ui/icons';
+import Peer, { MeshRoom } from 'skyway-js';
 import hark from 'hark';
 import getYoutubeId from 'get-youtube-id';
 import { ToastContainer, toast } from 'react-toastify';
@@ -24,7 +24,7 @@ type UserListItem = {
     id: string,
     name: string,
     icon: string,
-    stream?: RoomStream,
+    stream: MediaStream | null,
     isSpeaking: boolean
 };
 
@@ -63,16 +63,17 @@ const getMediaTrackConstraints = (): MediaTrackConstraints => {
 
 const Chat = () => {
     const state = store.getState();
-    const [myId, setMyId] = useState('');
+    const [peer, setPeer] = useState<Peer | null>(null);
     const [userName, setUserName] = useState(state.username);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isMicMute, setIsMicMute] = useState(false);
+    const [isScreenSharing, setIsScreenSharing] = useState(false);
     const [youtubeVideoId, setYoutubeVideoId] = useState('');
     const [isRatingDialogOpen, setIsRatingDialogOpen] = useState(false);
     const [sessionStartTime, setSessionStartTime] = useState<number>(0);
-    const [localAudioStream, setLocalAudioStream] = useState<MediaStream>();
-    const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
-    const [meshRoom, setMeshRoom] = useState<MeshRoom>();
+    const [audioStream, setAudioStream] = useState<MediaStream | null>();
+    const [screenStream, setScreenStream] = useState<MediaStream | null>();
+    const [meshRoom, setMeshRoom] = useState<MeshRoom | null>(null);
     const [userList, setUserList] = useState<UserListItem[]>([]);
     const [newChatMessage, setNewChatMessage] = useState<ChatMessage>();
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -80,6 +81,7 @@ const Chat = () => {
     const parameters = parseQueryParameter(window.location.search.replace('?', ''));
     const roomName = (state.roomname === '') ? parameters.room : state.roomname;
     const userIconUrl = state.usericon;
+    let screenSharingUserId: string = '';
 
     if (roomName === '') {
         window.location.href = window.location.origin;
@@ -90,25 +92,146 @@ const Chat = () => {
     }
 
     const sendChatMessage = (msg: string) => {
+        if (msg === '' || !meshRoom || !peer) {
+            return;
+        }
         const sendData = {
             message: msg,
             type: ActionType.MESSAGE
         };
-        meshRoom?.send(sendData);
-        setNewChatMessage({ user: myId, message: msg });
+        meshRoom.send(sendData);
+        setNewChatMessage({ user: peer.id, message: msg });
+    };
+    const joinMeshRoom = (_peer: Peer, _roomName: string, stream: MediaStream): (MeshRoom | null) => {
+        if (!_peer || _roomName === '' || !stream) {
+            console.error(`joinMeshRoom() args error ${_peer} ${_roomName} ${stream}`);
+            return null;
+        }
+        const _meshRoom: MeshRoom = _peer.joinRoom(_roomName, {
+            mode: 'mesh',
+            stream: stream
+        });
+        _meshRoom.on('open', () => {
+            console.log(`Join room ${_roomName}`);
+            if (userName !== '') {
+                _meshRoom.send({
+                    type: ActionType.NOTICE_NAME,
+                    name: userName,
+                    icon: userIconUrl
+                });
+            }
+        });
+
+        _meshRoom.on('peerJoin', peerId => {
+            console.log(`${peerId} joined`);
+            const sound = new Audio('sound.mp3');
+            sound.play();
+            toast('新規参加者が入室しました');
+            _meshRoom.send({
+                type: ActionType.NOTICE_NAME,
+                name: userName,
+                icon: userIconUrl
+            });
+            setUserList(currentUserList => {
+                const newUserList = [...currentUserList];
+                newUserList.push({
+                    id: peerId,
+                    name: '',
+                    icon: '',
+                    stream: null,
+                    isSpeaking: false
+                });
+                return newUserList;
+            });
+        });
+        _meshRoom.on('peerLeave', peerId => {
+            console.log(`${peerId} leave`);
+            if (screenSharingUserId === peerId) {
+                console.log(`screensharing stop`);
+                setScreenStream(null);
+                screenSharingUserId = '';
+            }
+            setUserList(currentUserList => {
+                const newUserList = [...currentUserList];
+                const leaveUserIndex = newUserList.findIndex(s => s.id === peerId);
+                newUserList.splice(leaveUserIndex, 1);
+                return newUserList;
+            });
+        });
+
+        _meshRoom.on('stream', stream => {
+            console.log(`${stream.peerId} streaming start`);
+            const videoTracks = stream.getVideoTracks();
+            const audioTracks = stream.getAudioTracks();
+            let receivedAudioStream = new MediaStream();
+            if (videoTracks.length > 0) {//screen
+                const screenSharingStartUserID = stream.peerId;
+                console.log(`screensharing start ${screenSharingStartUserID}`);
+                toast(`${screenSharingStartUserID} さんが画面共有を開始しました`);
+                screenSharingUserId = screenSharingStartUserID;
+                let receivedVideoStream = new MediaStream();
+                videoTracks.forEach(t => receivedVideoStream.addTrack(t.clone()));
+                setScreenStream(receivedVideoStream);
+            }
+            audioTracks.forEach(t => receivedAudioStream.addTrack(t.clone()));
+            setUserList(currentUserList => {
+                const newUserList = [...currentUserList];
+                const streamStartUserIndex = newUserList.findIndex(u => u.id === stream.peerId);
+                if (streamStartUserIndex === -1) {
+                    newUserList.push({
+                        id: stream.peerId,
+                        name: '',
+                        icon: '',
+                        isSpeaking: false,
+                        stream: stream
+                    });
+                } else {
+                    newUserList[streamStartUserIndex].stream = receivedAudioStream;
+                }
+                return newUserList;
+            });
+        });
+        _meshRoom.on('data', ({ data, src }) => {
+            switch (data.type) {
+                case ActionType.NOTICE_NAME:
+                    setUserList(currentUserList => {
+                        return currentUserList.map(u => {
+                            if (u.id === src) {
+                                u.name = data.name;
+                            }
+                            return u;
+                        });
+                    });
+                    break;
+                case ActionType.MESSAGE: setNewChatMessage({ user: src, message: data.message }); break;
+                case ActionType.NOTICE_IS_SPEAKING:
+                    setUserList(currentUserList => {
+                        return currentUserList.map(u => {
+                            if (src === u.id) {
+                                u.isSpeaking = data.isSpeaking;
+                            }
+                            return u;
+                        });
+                    });
+                    break;
+            }
+        });
+
+        return _meshRoom;
     };
     useEffect(() => {
+        let _localAudioStream: MediaStream | null = null;
+        let _meshRoom: MeshRoom | null = null;
         const apiKey = process.env.REACT_APP_SKYWAY_API_KEY || '';
-        const peer = new Peer({
+        const _peer: Peer = new Peer({
             key: apiKey
         });
-        peer.on('open', async id => {
+        _peer.on('open', async id => {
             console.log(`Conenction established between SkyWay Server!! My ID is ${id}`);
             setSessionStartTime((new Date()).getTime());
-            setMyId(id);
             setUserName((userName === '') ? id : userName);
             const audioTrackConstraints = getMediaTrackConstraints()
-            const _localAudioStream = await navigator.mediaDevices.getUserMedia({
+            _localAudioStream = await navigator.mediaDevices.getUserMedia({
                 video: false,
                 audio: audioTrackConstraints
             });
@@ -119,117 +242,16 @@ const Chat = () => {
             speechEvent.on('stopped_speaking', () => {
                 setIsSpeaking(false);
             });
-            const _meshRoom: MeshRoom = peer.joinRoom(roomName, {
-                mode: 'mesh',
-                stream: _localAudioStream
-            });
-            _meshRoom.on('open', () => {
-                console.log(`Join room ${roomName}`);
-                if (userName !== '') {
-                    _meshRoom.send({
-                        type: ActionType.NOTICE_NAME,
-                        name: userName,
-                        icon: userIconUrl
-                    });
-                }
-            });
-
-            _meshRoom.on('peerJoin', peerId => {
-                if (peerId !== `${roomName}-screen`) {
-                    const sound = new Audio('sound.mp3');
-                    sound.play();
-                    toast('新規参加者が入室しました');
-                    _meshRoom.send({
-                        type: ActionType.NOTICE_NAME,
-                        name: userName,
-                        icon: userIconUrl
-                    });
-                }
-            });
-            _meshRoom.on('peerLeave', peerId => {
-                console.log(`User ${peerId} leave`);
-                if (peerId === `${roomName}-screen`) {
-                    setScreenStream(null);
-                } else {
-                    setUserList(currentUserList => {
-                        const newUserList = [...currentUserList];
-                        const leaveUserIndex = newUserList.findIndex(s => s.id === peerId);
-                        newUserList.splice(leaveUserIndex, 1);
-                        return newUserList;
-                    });
-                }
-            });
-
-            _meshRoom.on('stream', stream => {
-                console.log(`User ${stream.peerId} streaming start`);
-                if (stream.peerId === `${roomName}-screen`) {
-                    setScreenStream(stream);
-                } else {
-                    setUserList(currentUserList => {
-                        const newUserList = [...currentUserList];
-                        const streamStartUserIndex = newUserList.findIndex(u => u.id === stream.peerId);
-                        if (streamStartUserIndex === -1) {
-                            newUserList.push({
-                                id: stream.peerId,
-                                name: '',
-                                icon: 'user.png',
-                                stream: stream,
-                                isSpeaking: false
-                            });
-                        } else {
-                            newUserList[streamStartUserIndex].stream = stream;
-                        }
-                        return newUserList;
-                    });
-                }
-            });
-            _meshRoom.on('data', data => {
-                switch (data.data.type) {
-                    case ActionType.NOTICE_NAME:
-                        setUserList(currentUserList => {
-                            const newUserList = [...currentUserList];
-                            const newUserIndex = newUserList.findIndex(u => u.id === data.src);
-                            if (newUserIndex === -1) {
-                                newUserList.push({
-                                    id: data.src,
-                                    name: data.data.name,
-                                    icon: (data.data.icon !== '') ? data.data.icon : 'user.png',
-                                    stream: undefined,
-                                    isSpeaking: false
-                                });
-                                return newUserList;
-                            } else {
-                                return [...currentUserList].map(u => {
-                                    if (u.id === data.src) {
-                                        u.name = data.data.name;
-                                    }
-                                    return u;
-                                });
-                            }
-                        });
-                        break;
-                    case ActionType.MESSAGE: setNewChatMessage({ user: data.src, message: data.data.message }); break;
-                    case ActionType.NOTICE_IS_SPEAKING:
-                        setUserList(currentUserList => {
-                            const newUserList = [...currentUserList].map(u => {
-                                if (data.src === u.id) {
-                                    u.isSpeaking = data.data.isSpeaking;
-                                }
-                                return u;
-                            });
-                            return newUserList;
-                        });
-                        break;
-                }
-            });
-
-            setLocalAudioStream(_localAudioStream);
+            _meshRoom = joinMeshRoom(_peer, roomName, _localAudioStream);
+            setAudioStream(_localAudioStream);
             setMeshRoom(_meshRoom);
         });
+        setPeer(_peer);
 
         return () => {
-            localAudioStream?.getTracks().forEach(t => t.stop());
-            peer.destroy();
+            _localAudioStream?.getTracks().forEach(t => t.stop());
+            _meshRoom?.close();
+            _peer.destroy();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [roomName]);
@@ -245,7 +267,7 @@ const Chat = () => {
                 const newChatMessages = [...prevChatMessages];
                 const sendMessageUserName = userList.find(u => u.id === newChatMessage.user)?.name;
                 const chatMessage = { ...newChatMessage };
-                chatMessage.user = (sendMessageUserName) ? sendMessageUserName : (newChatMessage.user === myId && userName) ? userName : newChatMessage.user;
+                chatMessage.user = (sendMessageUserName) ? sendMessageUserName : (newChatMessage.user === peer?.id && userName) ? userName : newChatMessage.user;
                 newChatMessages.push(chatMessage);
                 return newChatMessages;
             });
@@ -260,7 +282,10 @@ const Chat = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isSpeaking]);
     useEffect(() => {
-        const sendUserName = (userName !== '') ? userName : myId;
+        const sendUserName = (userName !== '') ? userName : peer?.id;
+        if (!sendUserName) {
+            return;
+        }
         meshRoom?.send({
             type: ActionType.NOTICE_NAME,
             name: sendUserName,
@@ -270,22 +295,50 @@ const Chat = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userName]);
     useEffect(() => {
-        const tracks = localAudioStream?.getAudioTracks();
+        const tracks = audioStream?.getAudioTracks();
         tracks?.forEach(t => t.enabled = !isMicMute);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isMicMute]);
     useEffect(() => {
-        if (screenStream) {
-            const $screen = screenRef.current;
-            if ($screen && $screen.srcObject === null) {
+        const startScreenShare = async () => {
+            if (!peer) {
+                return;
+            }
+            const mediaDevices = navigator.mediaDevices as any;
+            const _screenStream: MediaStream = await mediaDevices.getDisplayMedia();
+            audioStream?.getAudioTracks().forEach(t => _screenStream.addTrack(t.clone()));
+            meshRoom?.close();
+            const _meshRoom = joinMeshRoom(peer, roomName, _screenStream);
+            setMeshRoom(_meshRoom);
+            setScreenStream(_screenStream);
+        };
+        const stopScreenShare = async () => {
+            if (audioStream && peer) {
+                meshRoom?.close();
+                const _meshRoom = joinMeshRoom(peer, roomName, audioStream);
+                setMeshRoom(_meshRoom);
+            }
+            screenStream?.getTracks().forEach(t => t.stop());
+            setScreenStream(null);
+        };
+
+        if (isScreenSharing) {
+            startScreenShare();
+        } else {
+            stopScreenShare();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isScreenSharing]);
+    useEffect(() => {
+        const $screen = screenRef.current;
+        console.log(`play screen stream ${$screen !== null} ${screenStream}`);
+        if ($screen !== null) {
+            if (screenStream) {
                 $screen.srcObject = screenStream;
+                $screen.play();
                 const videoWidth = $screen.offsetWidth;
                 $screen.style.height = `${((9 / 16) * videoWidth)}px`;
-                setYoutubeVideoId('');
-            }
-        } else {
-            const $screen = screenRef.current;
-            if ($screen) {
+            } else {
                 $screen.pause();
                 $screen.srcObject = null;
             }
@@ -293,8 +346,9 @@ const Chat = () => {
     }, [screenStream]);
 
     const micButton = <Fab color={isMicMute ? 'secondary' : 'primary'} aria-label={isMicMute ? 'mic-off' : 'mic'} onClick={() => setIsMicMute(!isMicMute)}>{isMicMute ? <MicOff></MicOff> : <Mic></Mic>}</Fab>;
+    const screenShareButton = <Fab color={isScreenSharing ? 'secondary' : 'primary'} aria-label={isScreenSharing ? 'desktop-access-disabled' : 'desktop-windows'} disabled={!isScreenSharing && !!screenStream} onClick={() => setIsScreenSharing(!isScreenSharing)}>{isScreenSharing ? <StopScreenShare></StopScreenShare> : <ScreenShare></ScreenShare>}</Fab>;
     const screenVideo = (screenStream) ? <video ref={screenRef} autoPlay style={{ width: '100%', marginTop: '20px' }}></video> : <></>;
-    const youtube = (youtubeVideoId && !screenStream) ? <YoutubeView videoId={youtubeVideoId}></YoutubeView> : <></>;
+    const youtube = (youtubeVideoId && !isScreenSharing) ? <YoutubeView videoId={youtubeVideoId}></YoutubeView> : <></>;
 
     return (
         <Grid container style={{ height: '100%' }}>
@@ -324,9 +378,7 @@ const Chat = () => {
                         {micButton}
                     </Grid>
                     <Grid item xs={2} style={{ height: '20%', textAlign: 'center' }}>
-                        <Fab color='primary' aria-label='screen-share' disabled={(screenStream !== null)} onClick={() => { window.open(`${window.location.origin}/screen?room=${roomName}`, '_blank') }}>
-                            <ScreenShare></ScreenShare>
-                        </Fab>
+                        {screenShareButton}
                     </Grid>
                     <Grid item xs={12} style={{ height: '75%' }}>
                         <TextChat chatMessages={chatMessages} sendChatMessage={sendChatMessage}></TextChat>
