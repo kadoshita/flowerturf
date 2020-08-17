@@ -31,7 +31,8 @@ type UserListItem = {
 enum ActionType {
     NOTICE_NAME,
     MESSAGE,
-    NOTICE_IS_SPEAKING
+    NOTICE_IS_SPEAKING,
+    NOTICE_YOUTUBE_ID
 };
 
 const parseQueryParameter = (query: string): { [key: string]: string } => {
@@ -68,6 +69,7 @@ const Chat = () => {
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isMicMute, setIsMicMute] = useState(false);
     const [isScreenSharing, setIsScreenSharing] = useState(false);
+    const [isYoutubeOwner, setIsYoutubeOwner] = useState(false);
     const [youtubeVideoId, setYoutubeVideoId] = useState('');
     const [isRatingDialogOpen, setIsRatingDialogOpen] = useState(false);
     const [sessionStartTime, setSessionStartTime] = useState<number>(0);
@@ -95,9 +97,24 @@ const Chat = () => {
         if (msg === '' || !meshRoom || !peer) {
             return;
         }
+        if (isYoutubeOwner && msg === 'stop') {
+            setYoutubeVideoId('');
+            setIsYoutubeOwner(false);
+            const sendData = {
+                message: 'stop',
+                type: ActionType.NOTICE_YOUTUBE_ID
+            };
+            meshRoom.send(sendData);
+            return;
+        }
+        const getYoutubeIdResult = getYoutubeId(msg);
+        if (getYoutubeIdResult) {
+            setYoutubeVideoId(getYoutubeIdResult);
+            setIsYoutubeOwner(true);
+        }
         const sendData = {
             message: msg,
-            type: ActionType.MESSAGE
+            type: (getYoutubeIdResult) ? ActionType.NOTICE_YOUTUBE_ID : ActionType.MESSAGE
         };
         meshRoom.send(sendData);
         setNewChatMessage({ user: peer.id, message: msg });
@@ -214,6 +231,17 @@ const Chat = () => {
                         });
                     });
                     break;
+                case ActionType.NOTICE_YOUTUBE_ID:
+                    if (data.message === 'stop') {
+                        setYoutubeVideoId('');
+                        break;
+                    }
+                    const getYoutubeIdResult = getYoutubeId(data.message);
+                    if (getYoutubeIdResult) {
+                        setYoutubeVideoId(getYoutubeIdResult);
+                    }
+                    setNewChatMessage({ user: src, message: data.message });
+                    break;
             }
         });
 
@@ -257,12 +285,6 @@ const Chat = () => {
     }, [roomName]);
     useEffect(() => {
         if (newChatMessage) {
-            const getYoutubeIdResult = getYoutubeId(newChatMessage.message);
-            if (getYoutubeIdResult) {
-                setYoutubeVideoId(getYoutubeIdResult);
-            } else {
-                setYoutubeVideoId('');
-            }
             setChatMessages(prevChatMessages => {
                 const newChatMessages = [...prevChatMessages];
                 const sendMessageUserName = userList.find(u => u.id === newChatMessage.user)?.name;
