@@ -32,7 +32,9 @@ enum ActionType {
     NOTICE_NAME,
     MESSAGE,
     NOTICE_IS_SPEAKING,
-    NOTICE_YOUTUBE_ID
+    NOTICE_YOUTUBE_ID,
+    NOTICE_YOUTUBE_CURRENT_TIME,
+    NOTICE_YOUTUBE_PAUSE
 };
 
 const parseQueryParameter = (query: string): { [key: string]: string } => {
@@ -71,6 +73,8 @@ const Chat = () => {
     const [isScreenSharing, setIsScreenSharing] = useState(false);
     const [isYoutubeOwner, setIsYoutubeOwner] = useState(false);
     const [youtubeVideoId, setYoutubeVideoId] = useState('');
+    const [youtubeVideoStartPosition, setYoutubeVideoStartPosition] = useState<number>(0);
+    const [isYoutubePause, setIsYoutubePause] = useState<boolean>(false);
     const [isRatingDialogOpen, setIsRatingDialogOpen] = useState(false);
     const [sessionStartTime, setSessionStartTime] = useState<number>(0);
     const [audioStream, setAudioStream] = useState<MediaStream | null>();
@@ -100,6 +104,7 @@ const Chat = () => {
         if (isYoutubeOwner && msg === 'stop') {
             setYoutubeVideoId('');
             setIsYoutubeOwner(false);
+            setYoutubeVideoStartPosition(0);
             const sendData = {
                 message: 'stop',
                 type: ActionType.NOTICE_YOUTUBE_ID
@@ -234,6 +239,8 @@ const Chat = () => {
                 case ActionType.NOTICE_YOUTUBE_ID:
                     if (data.message === 'stop') {
                         setYoutubeVideoId('');
+                        setYoutubeVideoStartPosition(0);
+                        setIsYoutubePause(false);
                         break;
                     }
                     const getYoutubeIdResult = getYoutubeId(data.message);
@@ -242,10 +249,35 @@ const Chat = () => {
                     }
                     setNewChatMessage({ user: src, message: data.message });
                     break;
+                case ActionType.NOTICE_YOUTUBE_CURRENT_TIME:
+                    setYoutubeVideoStartPosition(data.message);
+                    setIsYoutubePause(false);
+                    break;
+                case ActionType.NOTICE_YOUTUBE_PAUSE:
+                    setIsYoutubePause(true);
+                    break;
             }
         });
 
         return _meshRoom;
+    };
+    const onPositionChange = (currentTime: number) => {
+        if (meshRoom && isYoutubeOwner) {
+            const sendData = {
+                message: currentTime,
+                type: ActionType.NOTICE_YOUTUBE_CURRENT_TIME
+            };
+            meshRoom.send(sendData);
+        }
+    };
+    const onPause = () => {
+        if (meshRoom && isYoutubeOwner) {
+            const sendData = {
+                message: '',
+                type: ActionType.NOTICE_YOUTUBE_PAUSE
+            };
+            meshRoom.send(sendData);
+        }
     };
     useEffect(() => {
         let _localAudioStream: MediaStream | null = null;
@@ -370,7 +402,7 @@ const Chat = () => {
     const micButton = <Fab color={isMicMute ? 'secondary' : 'primary'} aria-label={isMicMute ? 'mic-off' : 'mic'} onClick={() => setIsMicMute(!isMicMute)}>{isMicMute ? <MicOff></MicOff> : <Mic></Mic>}</Fab>;
     const screenShareButton = <Fab color={isScreenSharing ? 'secondary' : 'primary'} aria-label={isScreenSharing ? 'desktop-access-disabled' : 'desktop-windows'} disabled={!isScreenSharing && !!screenStream} onClick={() => setIsScreenSharing(!isScreenSharing)}>{isScreenSharing ? <StopScreenShare></StopScreenShare> : <ScreenShare></ScreenShare>}</Fab>;
     const screenVideo = (screenStream) ? <video ref={screenRef} autoPlay style={{ width: '100%', marginTop: '20px' }}></video> : <></>;
-    const youtube = (youtubeVideoId && !isScreenSharing) ? <YoutubeView videoId={youtubeVideoId}></YoutubeView> : <></>;
+    const youtube = (youtubeVideoId && !isScreenSharing) ? <YoutubeView videoId={youtubeVideoId} onPositionChange={onPositionChange} youtubeVideoStartPosition={youtubeVideoStartPosition} onPause={onPause} isPause={isYoutubePause}></YoutubeView> : <></>;
 
     return (
         <Grid container style={{ height: '100%' }}>
