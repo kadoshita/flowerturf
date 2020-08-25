@@ -401,7 +401,7 @@ const Chat = () => {
 
     const micButton = <Fab color={isMicMute ? 'secondary' : 'primary'} aria-label={isMicMute ? 'mic-off' : 'mic'} onClick={() => setIsMicMute(!isMicMute)}>{isMicMute ? <MicOff></MicOff> : <Mic></Mic>}</Fab>;
     const screenShareButton = <Fab color={isScreenSharing ? 'secondary' : 'primary'} aria-label={isScreenSharing ? 'desktop-access-disabled' : 'desktop-windows'} disabled={!isScreenSharing && !!screenStream} onClick={() => setIsScreenSharing(!isScreenSharing)}>{isScreenSharing ? <StopScreenShare></StopScreenShare> : <ScreenShare></ScreenShare>}</Fab>;
-    const screenVideo = (screenStream) ? <video ref={screenRef} autoPlay style={{ width: '100%', marginTop: '20px' }}></video> : <></>;
+    const screenVideo = (screenStream) ? <video ref={screenRef} autoPlay style={{ width: '100%', marginTop: '20px' }} muted={isScreenSharing}></video> : <></>;
     const youtube = (youtubeVideoId && !isScreenSharing) ? <YoutubeView videoId={youtubeVideoId} onPositionChange={onPositionChange} youtubeVideoStartPosition={youtubeVideoStartPosition} onPause={onPause} isPause={isYoutubePause}></YoutubeView> : <></>;
 
     return (
