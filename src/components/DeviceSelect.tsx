@@ -9,6 +9,10 @@ const DeviceSelect = () => {
     const [inputDevice, setInputDevice] = useState('');
     useEffect(() => {
         async function getMediaDeviceInfo() {
+            const tempStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+            if (tempStream) {
+                tempStream.getTracks().forEach(t => t.stop());
+            }
             const mediaDevices = await (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audioinput' && d.label !== '');
             if (mediaDevices.length > 0) {
                 setDevices(mediaDevices);
