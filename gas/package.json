@@ -10,6 +10,6 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "@google/clasp": "^2.3.0"
+    "@google/clasp": "^2.3.1"
   }
 }
