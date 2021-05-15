@@ -4,6 +4,7 @@ interface IAction {
     type: string,
     value: string
 };
+// eslint-disable-next-line import/no-anonymous-default-export
 export default (state = { username: '', roomname: '', usericon: '' }, action: IAction) => {
     switch (action.type) {
         case ROOM_NAME_STORE:

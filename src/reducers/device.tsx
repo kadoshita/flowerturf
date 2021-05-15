@@ -14,6 +14,7 @@ const initState: TAudioDevice = {
     deviceLabel: ''
 };
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default (state = { inputDevice: initState, outputDevice: initState }, action: TAudioDeviceStoreAction) => {
     switch (action.type) {
         case AUDIO_INPUT_DEVICE_ID_STORE:
