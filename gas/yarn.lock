@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@google/clasp@^2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@google/clasp/-/clasp-2.3.0.tgz#3bc7c3c82ae218e7a75b5e127242f736ac3bf35b"
-  integrity sha512-P/l7ciNoHdfGsYGDBtkbpuLjH05vn6sIK/K7ehGWF8uK1GiHVMEb4tXIFNbFsTEzQvCg3QILZhJAnQEGqUAefQ==
+"@google/clasp@^2.3.1":
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/@google/clasp/-/clasp-2.3.2.tgz#2ff861b6ad6d8fb3e72696034534cefda6fd79cc"
+  integrity sha512-4mg5/bwbf6FiNPHXjn7s34pluvBBSIMYosFjHa8PxZ+VtdbohdkGPIam5XAFZ7JeHjT8Aa3O+Rb3OV4Zv+Q/oQ==
   dependencies:
     chalk "^2.4.2"
     cli-spinner "^0.2.10"
@@ -270,9 +270,9 @@ defer-to-connect@^1.0.1:
   integrity sha512-0ISdNousHvZT2EiFlZeZAHBUvSxmKswVCEf8hW7KWgG4a8MVEu/3Vb6uWYozkjylyCxe0JBIiRB1jV45S70WVQ==
 
 dns-packet@^5.1.2:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/dns-packet/-/dns-packet-5.2.1.tgz#26cec0be92252a1b97ed106482921192a7e08f72"
-  integrity sha512-JHj2yJeKOqlxzeuYpN1d56GfhzivAxavNwHj9co3qptECel27B1rLY5PifJAvubsInX5pGLDjAHuCfCUc2Zv/w==
+  version "5.2.4"
+  resolved "https://registry.yarnpkg.com/dns-packet/-/dns-packet-5.2.4.tgz#e004f409eadfa8ec861964dcb9eb395884fcf67d"
+  integrity sha512-vgu5Bx5IV8mXmh/9cn1lzn+J7okFlXe1vBRp+kCBJXg1nBED6Z/Q4e+QaDxQRSozMr14p/VQmdXwsf/I2wGjUA==
   dependencies:
     ip "^1.1.5"
 
