@@ -1,4 +1,5 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { updateAudioInputDevice } from '../../store/device';
@@ -13,20 +14,26 @@ const AudioInputDeviceSelect = () => {
   const updateAudioInputDevices = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const audioInputDevices = devices.filter((d) => d.kind === 'audioinput');
+    if (currentDevice === '') {
+      dispatch(updateAudioInputDevice(audioInputDevices[0].deviceId));
+    }
     setAudioInputDevices(audioInputDevices);
   };
 
-  const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  const handleChange = (e: SelectChangeEvent) => {
     dispatch(updateAudioInputDevice(e.target.value));
   };
   return (
-    <select onChange={handleChange} value={currentDevice}>
-      {audioInputDevices.map((device, index) => (
-        <option key={index} value={device.deviceId}>
-          {device.label}
-        </option>
-      ))}
-    </select>
+    <FormControl>
+      <InputLabel id='audio-input-device-label'>音声入力デバイス</InputLabel>
+      <Select onChange={handleChange} value={currentDevice} labelId='audio-input-device-label' label='音声入力デバイス'>
+        {audioInputDevices.map((device, index) => (
+          <MenuItem key={index} value={device.deviceId}>
+            {device.label}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   );
 };
 

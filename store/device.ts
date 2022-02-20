@@ -6,11 +6,16 @@ export type DeviceInfo = {
 
 export type DeviceState = {
   audioInput: DeviceInfo;
+  audioOutput: DeviceInfo;
 };
 
 export type UpdateAudioInputDevicePayload = string;
+export type UpdateAudioOutputDevicePayload = string;
 const initialState: DeviceState = {
   audioInput: {
+    deviceId: ''
+  },
+  audioOutput: {
     deviceId: ''
   }
 };
@@ -22,11 +27,11 @@ export const deviceSlice = createSlice({
     updateAudioInputDevice(state, action: PayloadAction<UpdateAudioInputDevicePayload>) {
       state.audioInput = { deviceId: action.payload };
     },
-    reset(): DeviceState {
-      return initialState;
+    updateAudioOutputDevice(state, action: PayloadAction<UpdateAudioOutputDevicePayload>) {
+      state.audioOutput = { deviceId: action.payload };
     }
   }
 });
 
-export const { updateAudioInputDevice, reset } = deviceSlice.actions;
+export const { updateAudioInputDevice, updateAudioOutputDevice } = deviceSlice.actions;
 export default deviceSlice.reducer;
