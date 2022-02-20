@@ -1,5 +1,7 @@
+import { Button } from '@mui/material';
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import Link from 'next/link';
 import styles from '../styles/Index.module.css';
 
 const Index: NextPage = () => {
@@ -17,6 +19,10 @@ const Index: NextPage = () => {
         <p className={styles.description}>
           FlowerTurfは複数人対応、インストール不要のボイスチャットツールです。URLを共有すれば、誰でも参加できます。
         </p>
+
+        <Link href="/home" passHref>
+          <Button variant='contained'>はじめる</Button>
+        </Link>
 
         <div className={styles.grid}>
           <div className={styles.card}>
