@@ -1,8 +1,8 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import styles from '../styles/Home.module.css';
+import styles from '../styles/Index.module.css';
 
-const Home: NextPage = () => {
+const Index: NextPage = () => {
   return (
     <div className={styles.container}>
       <Head>
@@ -46,4 +46,4 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+export default Index;
