@@ -1,4 +1,4 @@
-import { Avatar, Fab, Typography } from '@mui/material';
+import { Avatar, Fab, Tooltip, Typography } from '@mui/material';
 import { Box, SxProps } from '@mui/system';
 import { VolumeOff, VolumeUp } from '@mui/icons-material';
 import { useState } from 'react';
@@ -40,9 +40,9 @@ const style: { box: SxProps; avatar: (name: string) => SxProps; fab: React.CSSPr
   },
   avatar: (name: string) => ({
     bgcolor: stringToColor(name),
-    width: 192,
-    height: 192,
-    fontSize: 160,
+    width: '10vmin',
+    height: '10vmin',
+    fontSize: '5vmin',
   }),
   fab: {
     alignSelf: 'end',
@@ -58,11 +58,13 @@ const UserItem = (props: UserItemProps) => {
   };
   return (
     <Box sx={style.box}>
-      <Typography variant="h4">{props.name}</Typography>
+      <Typography variant="h5">{props.name}</Typography>
       <Avatar sx={style.avatar(props.name)}>{props.name.at(0)}</Avatar>
-      <Fab size="medium" style={style.fab} onClick={handleMuteChange}>
-        {isMuted ? <VolumeUp></VolumeUp> : <VolumeOff></VolumeOff>}
-      </Fab>
+      <Tooltip title={`ミュート${isMuted ? '解除' : ''}します`}>
+        <Fab size="medium" style={style.fab} onClick={handleMuteChange}>
+          {isMuted ? <VolumeOff></VolumeOff> : <VolumeUp></VolumeUp>}
+        </Fab>
+      </Tooltip>
     </Box>
   );
 };
