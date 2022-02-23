@@ -1,4 +1,4 @@
-import { FormControl, InputLabel, TextField } from '@mui/material';
+import { FormControl, TextField } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { updateUserName } from '../../store/user';

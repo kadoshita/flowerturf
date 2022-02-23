@@ -25,8 +25,8 @@ const AudioOutputDeviceSelect = () => {
   };
   return (
     <FormControl>
-      <InputLabel id="audio-input-device-label">音声出力デバイス</InputLabel>
-      <Select onChange={handleChange} value={currentDevice} labelId="audio-input-device-label" label="音声出力デバイス">
+      <InputLabel id="audio-output-device-label">音声出力デバイス</InputLabel>
+      <Select onChange={handleChange} value={currentDevice} labelId="audio-output-device-label" label="音声出力デバイス">
         {audioOutputDevices.map((device, index) => (
           <MenuItem key={index} value={device.deviceId}>
             {device.label}
