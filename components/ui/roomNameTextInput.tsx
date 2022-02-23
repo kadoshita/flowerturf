@@ -13,7 +13,7 @@ const RoomNameTextInput = () => {
 
   return (
     <FormControl>
-      <TextField onChange={handleChange} label="Room名" value={currentRoomName}></TextField>
+      <TextField onChange={handleChange} label="Room名" value={currentRoomName} required></TextField>
     </FormControl>
   );
 };

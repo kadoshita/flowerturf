@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import DeviceSelect from '../components/model/deviceSelect';
-import RoomNameInput from '../components/model/roomNameInput';
+import NameInput from '../components/model/nameInput';
 import { RootState } from '../store';
 import styles from '../styles/Home.module.css';
 
@@ -21,7 +21,7 @@ const Home: NextPage = () => {
       <main className={styles.main}>
         <Stack spacing={2}>
           <DeviceSelect></DeviceSelect>
-          <RoomNameInput></RoomNameInput>
+          <NameInput></NameInput>
           <Link href={`/app/${currentRoomName}`} passHref>
             <Button variant="contained">開始</Button>
           </Link>
