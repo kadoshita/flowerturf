@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 export type UserItemProps = {
   name: string;
-  isMuted: boolean;
+  onChangeMute: () => void;
 };
 
 // ref: https://github.com/mui/material-ui/blob/master/docs/data/material/components/avatars/BackgroundLetterAvatars.js
@@ -55,11 +55,12 @@ const style: { box: SxProps; avatar: (name: string) => SxProps; fabs: React.CSSP
     },
   };
 const MySelfUserItem = (props: UserItemProps) => {
-  const [isMuted, setIsMuted] = useState<boolean>(props.isMuted);
+  const [isMuted, setIsMuted] = useState<boolean>(true);
   const [isScreenSharing, setIsScreenSharing] = useState<boolean>(false);
 
   const handleMuteChange = () => {
     setIsMuted(!isMuted);
+    props.onChangeMute();
   };
   const handleScreenShare = () => {
     setIsScreenSharing(!isScreenSharing);

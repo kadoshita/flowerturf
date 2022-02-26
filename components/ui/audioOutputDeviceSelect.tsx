@@ -9,16 +9,15 @@ const AudioOutputDeviceSelect = () => {
   const currentDevice = useSelector((state: RootState) => state.device.audioOutput.deviceId);
   const dispatch = useDispatch();
   useEffect(() => {
-    updateAudioOutputDevices();
+    (async () => {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const audioOutputDevices = devices.filter((d) => d.kind === 'audiooutput');
+      if (currentDevice === '') {
+        dispatch(updateAudioOutputDevice(audioOutputDevices[0].deviceId));
+      }
+      setAudioOutputDevices(audioOutputDevices);
+    })();
   }, []);
-  const updateAudioOutputDevices = async () => {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const audioOutputDevices = devices.filter((d) => d.kind === 'audiooutput');
-    if (currentDevice === '') {
-      dispatch(updateAudioOutputDevice(audioOutputDevices[0].deviceId));
-    }
-    setAudioOutputDevices(audioOutputDevices);
-  };
 
   const handleChange = (e: SelectChangeEvent) => {
     dispatch(updateAudioOutputDevice(e.target.value));
@@ -26,7 +25,12 @@ const AudioOutputDeviceSelect = () => {
   return (
     <FormControl>
       <InputLabel id="audio-output-device-label">音声出力デバイス</InputLabel>
-      <Select onChange={handleChange} value={currentDevice} labelId="audio-output-device-label" label="音声出力デバイス">
+      <Select
+        onChange={handleChange}
+        value={currentDevice}
+        labelId="audio-output-device-label"
+        label="音声出力デバイス"
+      >
         {audioOutputDevices.map((device, index) => (
           <MenuItem key={index} value={device.deviceId}>
             {device.label}

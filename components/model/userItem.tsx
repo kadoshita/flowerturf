@@ -1,11 +1,14 @@
 import { Avatar, Fab, Tooltip, Typography } from '@mui/material';
 import { Box, SxProps } from '@mui/system';
 import { VolumeOff, VolumeUp } from '@mui/icons-material';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Subscription } from '@skyway-sdk/core';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 
 export type UserItemProps = {
   name: string;
-  isMuted: boolean;
+  subscription: Subscription | undefined;
 };
 
 // ref: https://github.com/mui/material-ui/blob/master/docs/data/material/components/avatars/BackgroundLetterAvatars.js
@@ -51,15 +54,39 @@ const style: { box: SxProps; avatar: (name: string) => SxProps; fab: React.CSSPr
   },
 };
 const UserItem = (props: UserItemProps) => {
-  const [isMuted, setIsMuted] = useState<boolean>(props.isMuted);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const audioOutputDevice = useSelector((state: RootState) => state.device.audioOutput.deviceId);
+  const audioRef = useRef<HTMLAudioElement>();
 
   const handleMuteChange = () => {
+    audioRef.current.muted = !isMuted;
     setIsMuted(!isMuted);
   };
+  useEffect(() => {
+    (async () => {
+      if (props.subscription === undefined) {
+        audioRef.current.srcObject = null;
+        audioRef.current.pause();
+      } else {
+        const { stream } = props.subscription;
+        if (stream && stream.contentType === 'audio') {
+          stream.attach(audioRef.current);
+          await audioRef.current.play();
+        }
+      }
+    })();
+  }, [props.subscription]);
+
+  useEffect(() => {
+    (async () => {
+      await audioRef.current.setSinkId(audioOutputDevice);
+    })();
+  }, [audioOutputDevice]);
   return (
     <Box sx={style.box}>
       <Typography variant="h5">{props.name}</Typography>
       <Avatar sx={style.avatar(props.name)}>{props.name.at(0)}</Avatar>
+      <audio ref={audioRef} autoPlay></audio>
       <Tooltip title={`ミュート${isMuted ? '解除' : ''}します`}>
         <Fab size="medium" style={style.fab} onClick={handleMuteChange}>
           {isMuted ? <VolumeOff></VolumeOff> : <VolumeUp></VolumeUp>}
