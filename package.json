@@ -14,7 +14,9 @@
     "@mui/icons-material": "^5.4.2",
     "@mui/material": "^5.4.2",
     "@reduxjs/toolkit": "^1.7.2",
+    "@skyway-sdk/core": "^0.2.0-beta.11",
     "next": "12.1.0",
+    "node-fetch": "^2.6.7",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-redux": "^7.2.6",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "17.0.18",
+    "@types/node-fetch": "^2.6.1",
     "@types/react": "17.0.39",
     "eslint": "8.9.0",
     "eslint-config-next": "12.1.0",
