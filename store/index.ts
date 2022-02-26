@@ -2,12 +2,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import deviceReducer from './device';
 import roomReducer from './room';
 import userReducer from './user';
+import chatReducer from './chat';
 
 export const store = configureStore({
   reducer: {
     device: deviceReducer,
     room: roomReducer,
-    user: userReducer
+    user: userReducer,
+    chat: chatReducer
   }
 });
 

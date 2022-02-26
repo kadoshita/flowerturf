@@ -38,7 +38,7 @@ const style: { box: SxProps; avatar: (name: string) => SxProps; fab: React.CSSPr
     display: 'flex',
     flexDirection: 'column',
     border: 2,
-    borderColor: 'grey.200',
+    borderColor: 'white',
     borderRadius: '16px',
   },
   avatar: (name: string) => ({

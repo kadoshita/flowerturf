@@ -8,28 +8,31 @@ import {
   SkyWayChannel,
   RemoteMember,
   Subscription,
+  LocalDataStream,
 } from '@skyway-sdk/core';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import MenuAppBar from '../../components/model/appBar';
+import { useDispatch, useSelector } from 'react-redux';
 import MySelfUserItem from '../../components/model/mySelfUserItem';
 import { RootState } from '../../store';
 import fetch from 'node-fetch';
 import UserItem from './userItem';
+import { ChatMessage, updateChatMessage } from '../../store/chat';
 
 const Chat = () => {
-  const router = useRouter();
   const roomName: string = useSelector((state: RootState) => state.room.room.name);
   const userName: string = useSelector((state: RootState) => state.user.user.name);
   const audioInputDevice = useSelector((state: RootState) => state.device.audioInput.deviceId);
+  const sendMessage: ChatMessage = useSelector((state: RootState) => state.chat.sendMessage);
   const [localAudioStream, setLocalAudioStream] = useState<LocalAudioStream | null>(null);
+  const [localDataStream, setLocalDataStream] = useState<LocalDataStream | null>(null);
   const [skywayChannel, setSkyWayChannel] = useState<Channel>();
   const [memberMySelf, setMemberMySelf] = useState<LocalPerson>();
-  const [myPublication, setMyPublication] = useState<Publication | null>(null);
+  const [myAudioPublication, setAudioMyPublication] = useState<Publication<LocalAudioStream> | null>(null);
+  const [myTextPublication, setMyTextPublication] = useState<Publication<LocalDataStream> | null>(null);
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [members, setMembers] = useState<RemoteMember[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     let localStream: LocalAudioStream;
@@ -104,6 +107,19 @@ const Chat = () => {
         console.log(`member ${member.name} left self`);
       });
       member.onStreamSubscribed.add(({ subscription }) => {
+        console.log(`member ${member.name} subscribed ${subscription.contentType} ${subscription.id}`);
+        if (subscription.stream.contentType === 'data') {
+          subscription.stream.onData.add((data) => {
+            dispatch(
+              updateChatMessage({
+                message: data as unknown as string,
+                sender: subscription.publication.publisher.name,
+                direction: 'incoming',
+                sendTime: new Date().toLocaleTimeString(),
+              })
+            );
+          });
+        }
         setSubscriptions([...subscriptions, subscription]);
       });
       member.onStreamUnsubscribed.add(({ subscription }) => {
@@ -136,17 +152,35 @@ const Chat = () => {
 
   useEffect(() => {
     if (isMuted) {
-      if (skywayChannel && memberMySelf && myPublication) {
-        memberMySelf.unpublish(myPublication.id);
+      if (skywayChannel && memberMySelf) {
+        if (myAudioPublication) {
+          memberMySelf.unpublish(myAudioPublication.id);
+        }
+        if (myTextPublication) {
+          memberMySelf.unpublish(myTextPublication.id);
+        }
       }
     } else {
-      if (skywayChannel && memberMySelf && localAudioStream) {
-        memberMySelf.publish(localAudioStream).then((publication) => {
-          setMyPublication(publication);
+      if (skywayChannel && memberMySelf) {
+        if (localAudioStream) {
+          memberMySelf.publish(localAudioStream).then((publication) => {
+            setAudioMyPublication(publication);
+          });
+        }
+        const localDataStream = new LocalDataStream();
+        setLocalDataStream(localDataStream);
+        memberMySelf.publish(localDataStream).then((publication) => {
+          setMyTextPublication(publication);
         });
       }
     }
   }, [isMuted]);
+
+  useEffect(() => {
+    if (sendMessage) {
+      localDataStream.write(sendMessage.message);
+    }
+  }, [sendMessage]);
 
   const handleChangeMute = () => {
     setIsMuted(!isMuted);
@@ -154,7 +188,6 @@ const Chat = () => {
 
   return (
     <div>
-      <MenuAppBar roomName={roomName} userName={userName}></MenuAppBar>
       <Grid container spacing={2} padding={1}>
         <Grid item xs={6} lg={3}>
           <MySelfUserItem name={userName} onChangeMute={handleChangeMute}></MySelfUserItem>

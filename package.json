@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chatscope/chat-ui-kit-react": "^1.8.3",
+    "@chatscope/chat-ui-kit-styles": "^1.2.3",
     "@emotion/react": "^11.8.1",
     "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.4.2",
@@ -19,6 +21,7 @@
     "node-fetch": "^2.6.7",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-linkify": "^1.0.0-alpha",
     "react-redux": "^7.2.6",
     "redux": "^4.1.2"
   },
