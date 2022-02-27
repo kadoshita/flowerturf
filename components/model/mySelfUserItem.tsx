@@ -1,7 +1,9 @@
 import { Avatar, Fab, Stack, Tooltip, Typography } from '@mui/material';
 import { Box, SxProps } from '@mui/system';
 import { ScreenShare, StopScreenShare, VolumeOff, VolumeUp } from '@mui/icons-material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 
 export type UserItemProps = {
   name: string;
@@ -58,6 +60,16 @@ const style: { box: SxProps; avatar: (name: string) => SxProps; fabs: React.CSSP
 const MySelfUserItem = (props: UserItemProps) => {
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [isScreenSharing, setIsScreenSharing] = useState<boolean>(false);
+  const [screenShareDisable, setScreenShareDisable] = useState<boolean>(false);
+  const currentScreenStream = useSelector((state: RootState) => state.stream.screen);
+
+  useEffect(() => {
+    if (!currentScreenStream.isSharing && currentScreenStream.stream) {
+      setScreenShareDisable(true);
+    } else {
+      setScreenShareDisable(false);
+    }
+  }, [currentScreenStream]);
 
   const handleMuteChange = () => {
     setIsMuted(!isMuted);
@@ -73,7 +85,7 @@ const MySelfUserItem = (props: UserItemProps) => {
       <Avatar sx={style.avatar(props.name)}>{props.name.at(0)}</Avatar>
       <Stack direction="row" style={style.fabs}>
         <Tooltip title={`画面共有${isScreenSharing ? '停止' : ''}します`}>
-          <Fab size="medium" style={style.fab} onClick={handleScreenShare}>
+          <Fab size="medium" style={style.fab} onClick={handleScreenShare} disabled={screenShareDisable}>
             {isScreenSharing ? <StopScreenShare></StopScreenShare> : <ScreenShare></ScreenShare>}
           </Fab>
         </Tooltip>
