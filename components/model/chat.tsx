@@ -42,27 +42,29 @@ const Chat = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    let localStream: LocalAudioStream;
-    const getAudioStream = async () => {
-      const getAudioTrack = async () => {
-        localAudioStream?.track.stop();
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: false,
-          audio: { deviceId: audioInputDevice },
+    let localStream: MediaStream | null;
+    (async () => {
+      localAudioStream?.track.stop();
+      localStream = await navigator.mediaDevices.getUserMedia({
+        video: false,
+        audio: { deviceId: audioInputDevice },
+      });
+      console.log(audioInputDevice, localStream);
+      const [track] = localStream.getAudioTracks();
+      if (localAudioStream) {
+        localAudioStream.replaceTrack(track);
+      } else {
+        const stream = new LocalAudioStream('audio', track);
+        stream.track.addEventListener('ended', () => {
+          setLocalAudioStream(null);
         });
-        const [track] = stream.getAudioTracks();
-        localStream = new LocalAudioStream('audio', track.clone());
-        setLocalAudioStream(localStream);
-        stream.getAudioTracks().forEach((t) => t.stop());
-      };
-
-      getAudioTrack();
-    };
-    getAudioStream();
+        setLocalAudioStream(stream);
+      }
+    })();
 
     return () => {
-      localStream.track.stop();
-      setLocalAudioStream(null);
+      localStream?.getTracks().forEach((t) => t.stop());
+      localStream = null;
     };
   }, [audioInputDevice]);
 
