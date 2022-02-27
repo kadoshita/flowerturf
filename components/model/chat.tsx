@@ -9,6 +9,7 @@ import {
   RemoteMember,
   Subscription,
   LocalDataStream,
+  LocalVideoStream,
 } from '@skyway-sdk/core';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,12 +18,14 @@ import { RootState } from '../../store';
 import fetch from 'node-fetch';
 import UserItem from './userItem';
 import { updateChatMessage } from '../../store/chat';
+import { updateScreenStream } from '../../store/stream';
 
 const Chat = () => {
   const roomName: string = useSelector((state: RootState) => state.room.room.name);
   const userName: string = useSelector((state: RootState) => state.user.user.name);
   const audioInputDevice = useSelector((state: RootState) => state.device.audioInput.deviceId);
   const sendMessage = useSelector((state: RootState) => state.chat.sendMessage);
+  const currentScreenStream = useSelector((state: RootState) => state.stream.screen);
   const [localAudioStream, setLocalAudioStream] = useState<LocalAudioStream | null>(null);
   const [localDataStream, setLocalDataStream] = useState<LocalDataStream | null>(null);
   const [skywayChannel, setSkyWayChannel] = useState<Channel>();
@@ -141,6 +144,7 @@ const Chat = () => {
     return () => {
       localAudioStream?.track.stop();
       setLocalAudioStream(null);
+      dispatch(updateScreenStream({ isSharing: false, stream: null }));
       (async () => {
         await member.leave();
         if (channel.members.length === 0) {
@@ -186,11 +190,36 @@ const Chat = () => {
     setIsMuted(!isMuted);
   };
 
+  const handleChangeShareScreen = () => {
+    (async () => {
+      // 自分が画面共有中
+      if (currentScreenStream.isSharing) {
+        currentScreenStream.stream.track.stop();
+        dispatch(updateScreenStream({ isSharing: false, stream: null }));
+      } else {
+        // channel内の誰も画面共有をしていない
+        if (!currentScreenStream.stream) {
+          const stream = await navigator.mediaDevices.getDisplayMedia();
+          const [track] = stream.getVideoTracks();
+          track.addEventListener('ended', () => {
+            dispatch(updateScreenStream({ isSharing: false, stream: null }));
+          });
+          const screenStream = new LocalVideoStream('screen', track);
+          dispatch(updateScreenStream({ isSharing: true, stream: screenStream }));
+        }
+      }
+    })();
+  };
+
   return (
     <div>
       <Grid container spacing={2} padding={1}>
         <Grid item xs={6} lg={3}>
-          <MySelfUserItem name={userName} onChangeMute={handleChangeMute}></MySelfUserItem>
+          <MySelfUserItem
+            name={userName}
+            onChangeMute={handleChangeMute}
+            onChangeShareScreen={handleChangeShareScreen}
+          ></MySelfUserItem>
         </Grid>
         {members.map((m, i) => {
           return (

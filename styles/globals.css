@@ -7,6 +7,10 @@ body {
 
   color: #fff;
   background-color: #333333;
+  scrollbar-width: none;
+}
+body::-webkit-scrollbar {
+  display: none;
 }
 
 a {

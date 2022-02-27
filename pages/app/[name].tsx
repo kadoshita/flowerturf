@@ -2,11 +2,12 @@ import { Grid } from '@mui/material';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import MenuAppBar from '../../components/model/appBar';
 import TextChat from '../../components/model/textChat';
 import { RootState } from '../../store';
+import ShareScreen from '../../components/model/shareScreen';
 
 const Chat = dynamic(() => import('../../components/model/chat'), { ssr: false });
 
@@ -30,7 +31,8 @@ const App = () => {
       </Head>
       <MenuAppBar roomName={roomName} userName={userName}></MenuAppBar>
       <Grid container style={{ height: 'calc(100vmin - 64px)' }}>
-        <Grid item xs={10}>
+        <Grid item xs={10} style={{ overflowY: 'scroll' }}>
+          <ShareScreen></ShareScreen>
           <Chat></Chat>
         </Grid>
         <Grid item xs={2} style={{ backgroundColor: 'white' }}>

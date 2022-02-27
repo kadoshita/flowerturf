@@ -6,6 +6,7 @@ import { useState } from 'react';
 export type UserItemProps = {
   name: string;
   onChangeMute: () => void;
+  onChangeShareScreen: () => void;
 };
 
 // ref: https://github.com/mui/material-ui/blob/master/docs/data/material/components/avatars/BackgroundLetterAvatars.js
@@ -64,6 +65,7 @@ const MySelfUserItem = (props: UserItemProps) => {
   };
   const handleScreenShare = () => {
     setIsScreenSharing(!isScreenSharing);
+    props.onChangeShareScreen();
   };
   return (
     <Box sx={style.box}>
