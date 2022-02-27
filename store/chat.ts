@@ -8,14 +8,14 @@ export type ChatMessage = {
 };
 export type ChatMessageState = {
   messages: ChatMessage[];
-  sendMessage: ChatMessage;
+  sendMessage: ChatMessage | null;
 };
 
 export type UpdateChatMessagePayload = ChatMessage;
 export type SendMessagePayload = ChatMessage;
 const initialState: ChatMessageState = {
   messages: [],
-  sendMessage: undefined
+  sendMessage: null
 };
 
 export const chatSlice = createSlice({

@@ -16,13 +16,13 @@ import MySelfUserItem from '../../components/model/mySelfUserItem';
 import { RootState } from '../../store';
 import fetch from 'node-fetch';
 import UserItem from './userItem';
-import { ChatMessage, updateChatMessage } from '../../store/chat';
+import { updateChatMessage } from '../../store/chat';
 
 const Chat = () => {
   const roomName: string = useSelector((state: RootState) => state.room.room.name);
   const userName: string = useSelector((state: RootState) => state.user.user.name);
   const audioInputDevice = useSelector((state: RootState) => state.device.audioInput.deviceId);
-  const sendMessage: ChatMessage = useSelector((state: RootState) => state.chat.sendMessage);
+  const sendMessage = useSelector((state: RootState) => state.chat.sendMessage);
   const [localAudioStream, setLocalAudioStream] = useState<LocalAudioStream | null>(null);
   const [localDataStream, setLocalDataStream] = useState<LocalDataStream | null>(null);
   const [skywayChannel, setSkyWayChannel] = useState<Channel>();
@@ -108,12 +108,12 @@ const Chat = () => {
       });
       member.onStreamSubscribed.add(({ subscription }) => {
         console.log(`member ${member.name} subscribed ${subscription.contentType} ${subscription.id}`);
-        if (subscription.stream.contentType === 'data') {
+        if (subscription && subscription.stream && subscription.stream.contentType === 'data') {
           subscription.stream.onData.add((data) => {
             dispatch(
               updateChatMessage({
                 message: data as unknown as string,
-                sender: subscription.publication.publisher.name,
+                sender: subscription.publication.publisher.name || 'unknown',
                 direction: 'incoming',
                 sendTime: new Date().toLocaleTimeString(),
               })
@@ -178,7 +178,7 @@ const Chat = () => {
 
   useEffect(() => {
     if (sendMessage) {
-      localDataStream.write(sendMessage.message);
+      localDataStream?.write(sendMessage.message);
     }
   }, [sendMessage]);
 
@@ -196,7 +196,7 @@ const Chat = () => {
           return (
             <Grid item xs={6} lg={3} key={i}>
               <UserItem
-                name={m.name}
+                name={m.name || ''}
                 subscription={subscriptions.find((s) => s.publication.publisher.name === m.name)}
               ></UserItem>
             </Grid>

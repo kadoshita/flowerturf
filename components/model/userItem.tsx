@@ -56,14 +56,20 @@ const style: { box: SxProps; avatar: (name: string) => SxProps; fab: React.CSSPr
 const UserItem = (props: UserItemProps) => {
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const audioOutputDevice = useSelector((state: RootState) => state.device.audioOutput.deviceId);
-  const audioRef = useRef<HTMLAudioElement>();
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const handleMuteChange = () => {
+    if (!audioRef || !audioRef.current) {
+      return;
+    }
     audioRef.current.muted = !isMuted;
     setIsMuted(!isMuted);
   };
   useEffect(() => {
     (async () => {
+      if (!audioRef || !audioRef.current) {
+        return;
+      }
       if (props.subscription === undefined) {
         audioRef.current.srcObject = null;
         audioRef.current.pause();
@@ -79,6 +85,9 @@ const UserItem = (props: UserItemProps) => {
 
   useEffect(() => {
     (async () => {
+      if (!audioRef || !audioRef.current) {
+        return;
+      }
       await audioRef.current.setSinkId(audioOutputDevice);
     })();
   }, [audioOutputDevice]);
