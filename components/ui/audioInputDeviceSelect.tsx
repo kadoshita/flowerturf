@@ -10,6 +10,7 @@ const AudioInputDeviceSelect = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     (async () => {
+      await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
       const devices = await navigator.mediaDevices.enumerateDevices();
       const audioInputDevices = devices.filter((d) => d.kind === 'audioinput');
       if (currentDevice === '') {
