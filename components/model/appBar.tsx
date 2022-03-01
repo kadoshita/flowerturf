@@ -49,7 +49,7 @@ const MenuAppBar = (props: MenuAppBarProps) => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position='relative'>
+      <AppBar position="relative" style={{ zIndex: '3' }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {props.roomName}

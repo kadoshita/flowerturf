@@ -13,6 +13,12 @@ body::-webkit-scrollbar {
   display: none;
 }
 
+.user-items {
+  scrollbar-width: none;
+}
+.user-items::-webkit-scrollbar {
+  display: none;
+}
 a {
   color: inherit;
   text-decoration: none;

@@ -31,11 +31,11 @@ const App = () => {
       </Head>
       <MenuAppBar roomName={roomName} userName={userName}></MenuAppBar>
       <Grid container style={{ height: 'calc(100vmin - 64px)' }}>
-        <Grid item xs={10} style={{ overflowY: 'scroll' }}>
+        <Grid item xs={12} lg={10} style={{ overflowY: 'scroll' }} className="user-items">
           <ShareScreen></ShareScreen>
           <Chat></Chat>
         </Grid>
-        <Grid item xs={2} style={{ backgroundColor: 'white' }}>
+        <Grid item xs={12} lg={2}>
           <TextChat></TextChat>
         </Grid>
       </Grid>
