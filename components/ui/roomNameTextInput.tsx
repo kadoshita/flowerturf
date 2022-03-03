@@ -1,7 +1,8 @@
-import { FormControl, InputLabel, TextField } from '@mui/material';
+import { FormControl, TextField } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { updateRoomName } from '../../store/room';
+import { themeOptions } from '../../styles/theme';
 
 const RoomNameTextInput = () => {
   const currentRoomName = useSelector((state: RootState) => state.room.room.name);
@@ -13,7 +14,21 @@ const RoomNameTextInput = () => {
 
   return (
     <FormControl>
-      <TextField onChange={handleChange} label="Room名" value={currentRoomName} required></TextField>
+      <TextField
+        onChange={handleChange}
+        label="Room名"
+        color="info"
+        value={currentRoomName}
+        required
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: themeOptions.palette?.text?.primary,
+            },
+          },
+        }}
+        InputLabelProps={{ style: { color: themeOptions.palette?.text?.primary } }}
+      ></TextField>
     </FormControl>
   );
 };

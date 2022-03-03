@@ -2,6 +2,7 @@ import { FormControl, TextField } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { updateUserName } from '../../store/user';
+import { themeOptions } from '../../styles/theme';
 
 const UserNameTextInput = () => {
   const currentUserName = useSelector((state: RootState) => state.user.user.name);
@@ -13,7 +14,20 @@ const UserNameTextInput = () => {
 
   return (
     <FormControl>
-      <TextField onChange={handleChange} label="ユーザー名" value={currentUserName} required></TextField>
+      <TextField
+        onChange={handleChange}
+        label="ユーザー名"
+        value={currentUserName}
+        required
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: themeOptions.palette?.text?.primary,
+            },
+          },
+        }}
+        InputLabelProps={{ style: { color: themeOptions.palette?.text?.primary } }}
+      ></TextField>
     </FormControl>
   );
 };
