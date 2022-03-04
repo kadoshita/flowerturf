@@ -21,7 +21,7 @@ const Index: NextPage = () => {
         </p>
 
         <Link href="/home" passHref>
-          <Button variant="contained">はじめる</Button>
+          <Button variant="contained" color='secondary'>はじめる</Button>
         </Link>
 
         <div className={styles.grid}>

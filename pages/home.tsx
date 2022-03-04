@@ -23,7 +23,7 @@ const Home: NextPage = () => {
           <DeviceSelect></DeviceSelect>
           <NameInput></NameInput>
           <Link href={`/app/${currentRoomName}`} passHref>
-            <Button variant="contained">開始</Button>
+            <Button variant="contained" color='secondary'>開始</Button>
           </Link>
         </Stack>
       </main>

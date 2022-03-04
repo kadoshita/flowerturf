@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { updateAudioInputDevice } from '../../store/device';
-import { themeOptions } from '../../styles/theme';
+import { themeColor, themeOptions } from '../../styles/theme';
 
 const AudioInputDeviceSelect = () => {
   const [audioInputDevices, setAudioInputDevices] = useState<MediaDeviceInfo[]>([]);
@@ -36,8 +36,9 @@ const AudioInputDeviceSelect = () => {
         labelId="audio-input-device-label"
         label="音声入力デバイス"
         sx={{
+          color: themeOptions.palette?.text?.primary,
           '& fieldset': {
-            borderColor: themeOptions.palette?.text?.primary,
+            borderColor: themeColor,
           },
         }}
       >

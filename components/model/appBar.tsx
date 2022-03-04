@@ -11,6 +11,7 @@ import {
   ListItemIcon,
 } from '@mui/material';
 import { useState } from 'react';
+import { themeOptions } from '../../styles/theme';
 import DeviceChangeDialog from './deviceChangeDialog';
 import UserNameInputDialog from './userNameInputDialog';
 
@@ -79,13 +80,13 @@ const MenuAppBar = (props: MenuAppBarProps) => {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={onOpenUserNameChangeDialog}>
+            <MenuItem onClick={onOpenUserNameChangeDialog} style={{ color: themeOptions.palette?.text?.secondary }}>
               <ListItemIcon>
                 <AccountCircle></AccountCircle>
               </ListItemIcon>
               <ListItemText>ユーザー名を変更</ListItemText>
             </MenuItem>
-            <MenuItem onClick={onOpenDeviceChangeDialog}>
+            <MenuItem onClick={onOpenDeviceChangeDialog} style={{ color: themeOptions.palette?.text?.secondary }}>
               <ListItemIcon>
                 <HeadsetMic></HeadsetMic>
               </ListItemIcon>

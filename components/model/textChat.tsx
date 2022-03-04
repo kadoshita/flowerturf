@@ -4,6 +4,7 @@ import Linkify from 'react-linkify';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChatMessage, sendMessage, updateChatMessage } from '../../store/chat';
 import { RootState } from '../../store';
+import { themeOptions } from '../../styles/theme';
 
 const TextChat = () => {
   const userName: string = useSelector((state: RootState) => state.user.user.name);
@@ -23,7 +24,7 @@ const TextChat = () => {
   return (
     <div style={{ position: 'relative', height: 'calc(100vmin - 64px)' }}>
       <MainContainer>
-        <ChatContainer>
+        <ChatContainer style={{ backgroundColor: themeOptions.palette?.background }}>
           <MessageList>
             {messages.map((m, i) => {
               return (

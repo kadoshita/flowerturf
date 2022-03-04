@@ -4,6 +4,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { updateUserName } from '../../store/user';
+import { themeOptions } from '../../styles/theme';
 
 export type UserNameInputDialogProps = {
   open: boolean;
@@ -45,7 +46,9 @@ const UserNameInputDialog = (props: UserNameInputDialogProps) => {
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle><AccountCircle></AccountCircle> ユーザー名を変更</DialogTitle>
+        <DialogTitle style={{ color: themeOptions.palette?.text?.secondary }}>
+          <AccountCircle></AccountCircle> ユーザー名を変更
+        </DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -57,11 +60,16 @@ const UserNameInputDialog = (props: UserNameInputDialogProps) => {
             variant="standard"
             onChange={handleChange}
             value={userName}
+            InputProps={{ style: { color: themeOptions.palette?.text?.secondary } }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancel}>キャンセル</Button>
-          <Button onClick={handleStore}>設定</Button>
+          <Button onClick={handleCancel} style={{ color: themeOptions.palette?.text?.secondary }}>
+            キャンセル
+          </Button>
+          <Button onClick={handleStore} style={{ color: themeOptions.palette?.text?.secondary }}>
+            設定
+          </Button>
         </DialogActions>
       </Dialog>
     </div>

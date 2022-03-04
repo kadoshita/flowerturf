@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { updateAudioInputDevice, updateAudioOutputDevice } from '../../store/device';
+import { themeOptions } from '../../styles/theme';
 
 export type DeviceChangeDialogProps = {
   open: boolean;
@@ -79,7 +80,7 @@ const DeviceChangeDialog = (props: DeviceChangeDialogProps) => {
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>
+        <DialogTitle style={{ color: themeOptions.palette?.text?.secondary }}>
           <HeadsetMic></HeadsetMic> 音声デバイスを変更
         </DialogTitle>
         <DialogContent>
@@ -91,9 +92,10 @@ const DeviceChangeDialog = (props: DeviceChangeDialogProps) => {
                 value={audioInputDevice}
                 labelId="audio-input-device-label"
                 label="音声入力デバイス"
+                style={{ color: themeOptions.palette?.text?.secondary }}
               >
                 {audioInputDevices.map((device, index) => (
-                  <MenuItem key={index} value={device.deviceId}>
+                  <MenuItem key={index} value={device.deviceId} style={{ color: themeOptions.palette?.text?.secondary }}>
                     {device.label}
                   </MenuItem>
                 ))}
@@ -106,9 +108,10 @@ const DeviceChangeDialog = (props: DeviceChangeDialogProps) => {
                 value={audioOutputDevice}
                 labelId="audio-output-device-label"
                 label="音声出力デバイス"
+                style={{ color: themeOptions.palette?.text?.secondary }}
               >
                 {audioOutputDevices.map((device, index) => (
-                  <MenuItem key={index} value={device.deviceId}>
+                  <MenuItem key={index} value={device.deviceId} style={{ color: themeOptions.palette?.text?.secondary }}>
                     {device.label}
                   </MenuItem>
                 ))}
@@ -117,8 +120,8 @@ const DeviceChangeDialog = (props: DeviceChangeDialogProps) => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancel}>キャンセル</Button>
-          <Button onClick={handleStore}>設定</Button>
+          <Button onClick={handleCancel} style={{ color: themeOptions.palette?.text?.secondary }}>キャンセル</Button>
+          <Button onClick={handleStore} style={{ color: themeOptions.palette?.text?.secondary }}>設定</Button>
         </DialogActions>
       </Dialog>
     </div>

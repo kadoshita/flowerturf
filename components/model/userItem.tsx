@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Subscription } from '@skyway-sdk/core';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
+import { themeColor } from '../../styles/theme';
 
 export type UserItemProps = {
   name: string;
@@ -38,7 +39,7 @@ const style: { box: SxProps; avatar: (name: string) => SxProps; fab: React.CSSPr
     display: 'flex',
     flexDirection: 'column',
     border: 2,
-    borderColor: 'white',
+    borderColor: themeColor,
     borderRadius: '16px',
   },
   avatar: (name: string) => ({

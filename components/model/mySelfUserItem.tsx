@@ -4,6 +4,7 @@ import { ScreenShare, StopScreenShare, VolumeOff, VolumeUp } from '@mui/icons-ma
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
+import { themeColor } from '../../styles/theme';
 
 export type UserItemProps = {
   name: string;
@@ -39,7 +40,7 @@ const style: { box: SxProps; avatar: (name: string) => SxProps; fabs: React.CSSP
       display: 'flex',
       flexDirection: 'column',
       border: 2,
-      borderColor: 'grey.200',
+      borderColor: themeColor,
       borderRadius: '16px',
     },
     avatar: (name: string) => ({

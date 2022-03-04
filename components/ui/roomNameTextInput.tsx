@@ -2,7 +2,7 @@ import { FormControl, TextField } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { updateRoomName } from '../../store/room';
-import { themeOptions } from '../../styles/theme';
+import { themeColor, themeOptions } from '../../styles/theme';
 
 const RoomNameTextInput = () => {
   const currentRoomName = useSelector((state: RootState) => state.room.room.name);
@@ -23,7 +23,7 @@ const RoomNameTextInput = () => {
         sx={{
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
-              borderColor: themeOptions.palette?.text?.primary,
+              borderColor: themeColor,
             },
           },
         }}
