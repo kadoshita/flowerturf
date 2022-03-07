@@ -11,7 +11,6 @@ import {
   ListItemIcon,
 } from '@mui/material';
 import { useState } from 'react';
-import { themeOptions } from '../../styles/theme';
 import DeviceChangeDialog from './deviceChangeDialog';
 import UserNameInputDialog from './userNameInputDialog';
 
@@ -60,7 +59,6 @@ const MenuAppBar = (props: MenuAppBarProps) => {
             aria-label="account of current user"
             aria-controls="menu-appbar"
             aria-haspopup="true"
-            color="inherit"
             onClick={handleMenu}
           >
             <Settings />
@@ -80,13 +78,13 @@ const MenuAppBar = (props: MenuAppBarProps) => {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={onOpenUserNameChangeDialog} style={{ color: themeOptions.palette?.text?.secondary }}>
+            <MenuItem onClick={onOpenUserNameChangeDialog}>
               <ListItemIcon>
                 <AccountCircle></AccountCircle>
               </ListItemIcon>
               <ListItemText>ユーザー名を変更</ListItemText>
             </MenuItem>
-            <MenuItem onClick={onOpenDeviceChangeDialog} style={{ color: themeOptions.palette?.text?.secondary }}>
+            <MenuItem onClick={onOpenDeviceChangeDialog}>
               <ListItemIcon>
                 <HeadsetMic></HeadsetMic>
               </ListItemIcon>

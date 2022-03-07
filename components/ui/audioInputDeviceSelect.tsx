@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { updateAudioInputDevice } from '../../store/device';
-import { themeColor, themeOptions } from '../../styles/theme';
 
 const AudioInputDeviceSelect = () => {
   const [audioInputDevices, setAudioInputDevices] = useState<MediaDeviceInfo[]>([]);
@@ -27,7 +26,7 @@ const AudioInputDeviceSelect = () => {
   };
   return (
     <FormControl>
-      <InputLabel id="audio-input-device-label" style={{ color: themeOptions.palette?.text?.primary }}>
+      <InputLabel id="audio-input-device-label">
         音声入力デバイス
       </InputLabel>
       <Select
@@ -35,15 +34,9 @@ const AudioInputDeviceSelect = () => {
         value={currentDevice}
         labelId="audio-input-device-label"
         label="音声入力デバイス"
-        sx={{
-          color: themeOptions.palette?.text?.primary,
-          '& fieldset': {
-            borderColor: themeColor,
-          },
-        }}
       >
         {audioInputDevices.map((device, index) => (
-          <MenuItem key={index} value={device.deviceId} style={{ color: themeOptions.palette?.text?.secondary }}>
+          <MenuItem key={index} value={device.deviceId}>
             {device.label}
           </MenuItem>
         ))}

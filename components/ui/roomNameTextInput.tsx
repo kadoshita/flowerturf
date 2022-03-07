@@ -20,14 +20,6 @@ const RoomNameTextInput = () => {
         color="info"
         value={currentRoomName}
         required
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-              borderColor: themeColor,
-            },
-          },
-        }}
-        InputLabelProps={{ style: { color: themeOptions.palette?.text?.primary } }}
       ></TextField>
     </FormControl>
   );

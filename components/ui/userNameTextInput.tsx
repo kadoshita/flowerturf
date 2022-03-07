@@ -19,14 +19,6 @@ const UserNameTextInput = () => {
         label="ユーザー名"
         value={currentUserName}
         required
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-              borderColor: themeColor,
-            },
-          },
-        }}
-        InputLabelProps={{ style: { color: themeOptions.palette?.text?.primary } }}
       ></TextField>
     </FormControl>
   );

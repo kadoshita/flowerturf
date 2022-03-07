@@ -1,11 +1,11 @@
 import { ThemeOptions } from '@mui/material';
-import { green, blue, grey } from '@mui/material/colors';
 import { createTheme } from '@mui/material/styles';
 
 export const themeColor = '#009688';
 
 export const themeOptions: ThemeOptions = {
   palette: {
+    mode: 'dark',
     primary: {
       main: '#8a8989',
     },
@@ -13,11 +13,8 @@ export const themeOptions: ThemeOptions = {
       main: themeColor,
     },
     background: {
-      default: grey[900]
-    },
-    text: {
-      primary: grey[100],
-      secondary: grey[900]
+      default: '#333333',
+      paper: '#040404'
     }
   }
 };
