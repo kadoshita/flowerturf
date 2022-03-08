@@ -10,18 +10,19 @@ const Index: NextPage = () => {
       <Head>
         <title>FlowerTurf</title>
         <meta name="description" content="複数人対応、インストール不要のボイスチャットツール - FlowerTurf" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
         <h1 className={styles.title}>FlowerTurf</h1>
 
         <p className={styles.description}>
-          FlowerTurfは複数人対応、インストール不要のボイスチャットツールです。URLを共有すれば、誰でも参加できます。
+          FlowerTurfは複数人対応、インストール不要のボイスチャットツールです。URLを共有すれば、アカウント不要で誰でも参加できます。
         </p>
 
         <Link href="/home" passHref>
-          <Button variant="contained" color='secondary'>はじめる</Button>
+          <Button variant="contained" color="secondary">
+            はじめる
+          </Button>
         </Link>
 
         <div className={styles.grid}>
