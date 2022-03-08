@@ -1,16 +1,21 @@
-import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
-import { MainContainer, ChatContainer, MessageList, Message, MessageInput } from '@chatscope/chat-ui-kit-react';
-import Linkify from 'react-linkify';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChatMessage, sendMessage, updateChatMessage } from '../../store/chat';
 import { RootState } from '../../store';
+import { Button, List, TextField } from '@mui/material';
+import ChatMessageItem from '../ui/chatMessageItem';
+import { themeOptions } from '../../styles/theme';
+import { ChangeEvent, useState } from 'react';
 
 const TextChat = () => {
   const userName: string = useSelector((state: RootState) => state.user.user.name);
   const messages = useSelector((state: RootState) => state.chat.messages);
+  const [message, setMessage] = useState<string>('');
   const dispatch = useDispatch();
 
-  const handleOnSend = (html: string, message: string) => {
+  const handleOnSend = () => {
+    if (message === '') {
+      return;
+    }
     const m: ChatMessage = {
       sender: userName,
       message,
@@ -19,48 +24,46 @@ const TextChat = () => {
     };
     dispatch(sendMessage(m));
     dispatch(updateChatMessage(m));
+    setMessage('');
   };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setMessage(e.target.value);
+  };
+
   return (
-    <div style={{ position: 'relative', height: 'calc(100vmin - 64px)' }}>
-      <MainContainer>
-        <ChatContainer>
-          <MessageList style={{ backgroundColor: '#202020' }}>
-            {messages.map((m, i) => {
-              return (
-                <Message
-                  key={i}
-                  model={{
-                    direction: m.direction,
-                    message: m.message,
-                    sender: m.sender,
-                  }}
-                >
-                  <Message.CustomContent>
-                    <Linkify
-                      componentDecorator={(decoratedHref, decoratedText, key) => (
-                        <a target="blank" rel="noopener" href={decoratedHref} key={key}>
-                          {decoratedText}
-                        </a>
-                      )}
-                    >
-                      {m.message}
-                    </Linkify>
-                    <div>
-                      <small>
-                        {m.sender} {m.sendTime}
-                      </small>
-                    </div>
-                  </Message.CustomContent>
-                </Message>
-              );
-            })}
-          </MessageList>
-          <MessageInput
-            attachButton={false}
-            onSend={handleOnSend}
-          />
-        </ChatContainer>
-      </MainContainer>
+    <div
+      style={{
+        position: 'relative',
+        height: 'calc(100vmin - 64px)',
+        backgroundColor: themeOptions.palette?.background?.paper,
+      }}
+    >
+      <div style={{ overflowY: 'scroll', height: 'calc(100% - 112px)' }}>
+        <List>
+          {messages.map((m, i) => (
+            <ChatMessageItem
+              key={i}
+              isLatest={i === messages.length - 1}
+              sender={m.sender}
+              sendAt={m.sendTime}
+              message={m.message}
+              direction={m.direction}
+            ></ChatMessageItem>
+          ))}
+        </List>
+      </div>
+
+      <TextField
+        fullWidth
+        style={{ height: '64px' }}
+        onChange={handleChange}
+        value={message}
+        color="secondary"
+      ></TextField>
+      <Button fullWidth style={{ height: '48px' }} color="secondary" variant="contained" onClick={handleOnSend}>
+        送信
+      </Button>
     </div>
   );
 };
