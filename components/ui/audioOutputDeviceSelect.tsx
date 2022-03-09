@@ -10,12 +10,14 @@ const AudioOutputDeviceSelect = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     (async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
       const devices = await navigator.mediaDevices.enumerateDevices();
       const audioOutputDevices = devices.filter((d) => d.kind === 'audiooutput');
       if (currentDevice === '') {
         dispatch(updateAudioOutputDevice(audioOutputDevices[0].deviceId));
       }
       setAudioOutputDevices(audioOutputDevices);
+      stream.getTracks().forEach((t) => t.stop());
     })();
   }, []);
 
