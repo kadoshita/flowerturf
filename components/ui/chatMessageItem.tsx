@@ -1,6 +1,6 @@
 import { ListItem, ListItemText } from '@mui/material';
 import { useEffect, useRef } from 'react';
-import { themeOptions } from '../../styles/theme';
+import Linkify from 'linkify-react';
 
 export type ChatMessageItemProps = {
   sender: string;
@@ -24,7 +24,9 @@ const ChatMessageItem = (props: ChatMessageItemProps) => {
         primary={props.sender}
         secondary={
           <div>
-            <span>{props.message}</span>
+            <Linkify tagName="span" options={{ rel: 'nofollow noopener', target: '_blank' }}>
+              {props.message}
+            </Linkify>
             <div style={{ textAlign: 'right' }}>
               <small>{props.sendAt}</small>
             </div>
