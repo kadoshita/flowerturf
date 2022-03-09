@@ -200,13 +200,15 @@ const Chat = () => {
       currentScreenStream.stream?.track.stop();
       dispatch(updateScreenStream({ isSharing: false, stream: null }));
       (async () => {
+        if (roomName === '' || userName === '') {
+          return;
+        }
         await member.leave();
         if (channel.members.filter((m) => m.type === 'person').length === 0) {
           await channel.close();
         }
-      })().finally(() => {
         context.dispose();
-      });
+      })();
     };
   }, []);
 
