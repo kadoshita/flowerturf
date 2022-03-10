@@ -59,7 +59,7 @@ const style: { box: SxProps; avatar: (name: string) => SxProps; fabs: React.CSSP
     },
   };
 const MySelfUserItem = (props: UserItemProps) => {
-  const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isScreenSharing, setIsScreenSharing] = useState<boolean>(false);
   const [screenShareDisable, setScreenShareDisable] = useState<boolean>(false);
   const currentScreenStream = useSelector((state: RootState) => state.stream.screen);
@@ -69,6 +69,9 @@ const MySelfUserItem = (props: UserItemProps) => {
       setScreenShareDisable(true);
     } else {
       setScreenShareDisable(false);
+      if (!currentScreenStream.isSharing && !currentScreenStream.stream) {
+        setIsScreenSharing(false);
+      }
     }
   }, [currentScreenStream]);
 

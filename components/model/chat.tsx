@@ -260,22 +260,28 @@ const Chat = () => {
         setMyScreenForwarding(null);
       } else {
         // channel内の誰も画面共有をしていない
-        if (!currentScreenStream.stream) {
-          const stream = await navigator.mediaDevices.getDisplayMedia();
-          const [track] = stream.getVideoTracks();
-          track.addEventListener('ended', async () => {
+        if (!currentScreenStream.stream && memberMySelf) {
+          let screenPublication: Publication<LocalVideoStream>;
+          try {
+            const stream = await navigator.mediaDevices.getDisplayMedia();
+            const [track] = stream.getVideoTracks();
+            track.addEventListener('ended', async () => {
+              await screenPublication.cancel();
+              dispatch(updateScreenStream({ isSharing: false, stream: null }));
+              setMyScreenPublication(null);
+              setMyScreenForwarding(null);
+            });
+            const screenStream = new LocalVideoStream('screen', track);
+            dispatch(updateScreenStream({ isSharing: true, stream: screenStream }));
+            screenPublication = await memberMySelf.publish(screenStream);
+            if (screenPublication && sfuBotMember) {
+              setMyScreenPublication(screenPublication);
+              const forwarding = await sfuBotMember.startForwarding(screenPublication);
+              setMyScreenForwarding(forwarding);
+            }
+          } catch (e) {
             dispatch(updateScreenStream({ isSharing: false, stream: null }));
-            await myScreenPublication?.cancel();
-            setMyScreenPublication(null);
-            setMyScreenForwarding(null);
-          });
-          const screenStream = new LocalVideoStream('screen', track);
-          dispatch(updateScreenStream({ isSharing: true, stream: screenStream }));
-          const screenPublication = await memberMySelf?.publish(screenStream);
-          if (screenPublication && sfuBotMember) {
-            setMyScreenPublication(screenPublication);
-            const forwarding = await sfuBotMember.startForwarding(screenPublication);
-            setMyScreenForwarding(forwarding);
+            console.info('failed to get screen stream');
           }
         } else {
           console.info('他の誰かがすでに画面を共有しています');
