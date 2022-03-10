@@ -31,7 +31,7 @@ const App = () => {
       </Head>
       <MenuAppBar roomName={roomName} userName={userName}></MenuAppBar>
       <Grid container style={{ height: 'calc(100vmin - 64px)' }}>
-        <Grid item xs={12} lg={10} style={{ overflowY: 'scroll' }} className="user-items">
+        <Grid item xs={12} lg={10} className="user-items">
           <ShareScreen></ShareScreen>
           <Chat></Chat>
         </Grid>

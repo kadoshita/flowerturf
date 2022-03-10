@@ -27,6 +27,8 @@ a {
 }
 
 .user-items {
+  max-height: 100%;
+  overflow-y: scroll;
   scrollbar-width: none;
 }
 .user-items::-webkit-scrollbar {
