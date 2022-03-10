@@ -17,7 +17,7 @@ import MySelfUserItem from '../../components/model/mySelfUserItem';
 import { RootState } from '../../store';
 import fetch from 'node-fetch';
 import UserItem from './userItem';
-import { updateChatMessage } from '../../store/chat';
+import { clearChatMessage, updateChatMessage } from '../../store/chat';
 import { updateScreenStream } from '../../store/stream';
 import { Forwarding, SfuBotMember, SfuClientPlugin } from '@skyway-sdk/sfu-client';
 
@@ -199,6 +199,7 @@ const Chat = () => {
       setLocalAudioStream(null);
       currentScreenStream.stream?.track.stop();
       dispatch(updateScreenStream({ isSharing: false, stream: null }));
+      dispatch(clearChatMessage());
       (async () => {
         if (roomName === '' || userName === '') {
           return;

@@ -25,11 +25,14 @@ export const chatSlice = createSlice({
     updateChatMessage(state, action: PayloadAction<UpdateChatMessagePayload>) {
       state.messages = [...state.messages, action.payload];
     },
-    sendMessage(state, action: PayloadAction<SendMessagePayload>) {
+    sendChatMessage(state, action: PayloadAction<SendMessagePayload>) {
       state.sendMessage = action.payload;
+    },
+    clearChatMessage(state) {
+      state.messages = [];
     }
   }
 });
 
-export const { updateChatMessage, sendMessage } = chatSlice.actions;
+export const { updateChatMessage, sendChatMessage, clearChatMessage } = chatSlice.actions;
 export default chatSlice.reducer;
