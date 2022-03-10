@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { ChatMessage, sendMessage, updateChatMessage } from '../../store/chat';
+import { ChatMessage, sendChatMessage, updateChatMessage } from '../../store/chat';
 import { RootState } from '../../store';
 import { Button, List, TextField } from '@mui/material';
 import ChatMessageItem from '../ui/chatMessageItem';
@@ -22,7 +22,7 @@ const TextChat = () => {
       sendTime: new Date().toLocaleTimeString(),
       direction: 'outgoing',
     };
-    dispatch(sendMessage(m));
+    dispatch(sendChatMessage(m));
     dispatch(updateChatMessage(m));
     setMessage('');
   };

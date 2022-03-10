@@ -23,14 +23,14 @@ const ChatMessageItem = (props: ChatMessageItemProps) => {
       <ListItemText
         primary={props.sender}
         secondary={
-          <div>
+          <>
             <Linkify tagName="span" options={{ rel: 'nofollow noopener', target: '_blank' }}>
               {props.message}
             </Linkify>
-            <div style={{ textAlign: 'right' }}>
+            <p style={{ textAlign: 'right', margin: '0px' }}>
               <small>{props.sendAt}</small>
-            </div>
-          </div>
+            </p>
+          </>
         }
         ref={messageRef}
         style={{ overflowWrap: 'break-word' }}
