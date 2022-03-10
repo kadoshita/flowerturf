@@ -36,7 +36,7 @@ const Chat = () => {
   const [myTextPublication, setMyTextPublication] = useState<Publication<LocalDataStream> | null>(null);
   const [myScreenPublication, setMyScreenPublication] = useState<Publication<LocalVideoStream> | null>(null);
   const [myScreenForwarding, setMyScreenForwarding] = useState<Forwarding | null>(null);
-  const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
   const [members, setMembers] = useState<RemoteMember[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const dispatch = useDispatch();
@@ -69,16 +69,20 @@ const Chat = () => {
   }, [audioInputDevice]);
 
   useEffect(() => {
+    if (roomName === '' || userName === '') {
+      return;
+    }
     let context: SkyWayContext;
     let member: LocalPerson;
     let channel: Channel;
+    let localStream: MediaStream | null;
     (async () => {
       const authServerUrl = process.env.NEXT_PUBLIC_SKYWAY_AUTH_SERVER_URL || '';
       const res = await fetch(`${authServerUrl}?roomName=${roomName}`);
       const json = await res.json();
       const { token } = json;
       context = await SkyWayContext.Create(token, {
-        logLevel: 'debug',
+        logLevel: 'error',
       });
       const plugin = new SfuClientPlugin();
       context.registerPlugin(plugin);
@@ -91,14 +95,15 @@ const Chat = () => {
       channel.onMemberJoined.add(({ member }) => {
         if (member.subtype !== SfuBotMember.subtype) {
           console.log(`member ${member.name} joined`);
-          if (member.side === 'remote') {
+          if (member.name !== userName) {
             setMembers([...members, member as RemoteMember]);
           }
         }
       });
       channel.onMemberLeft.add(({ member }) => {
         console.log(`member ${member.name} left`);
-        setMembers([...members.filter((m) => m.name !== member.name)]);
+        const existMembers = members.filter((m) => m.name !== member.name);
+        setMembers([...existMembers]);
       });
       channel.onStreamPublished.add(async ({ publication }) => {
         console.log(`publication ${publication.id} ${publication.publisher.type} ${publication.contentType} published`);
@@ -130,16 +135,34 @@ const Chat = () => {
         setSfuBotMember(bot);
       }
 
+      localAudioStream?.track.stop();
+      localStream = await navigator.mediaDevices.getUserMedia({
+        video: false,
+        audio: { deviceId: audioInputDevice },
+      });
+      console.log(audioInputDevice, localStream);
+      const [track] = localStream.getAudioTracks();
+
+      const stream = new LocalAudioStream('audio', track);
+      stream.track.addEventListener('ended', () => {
+        setLocalAudioStream(null);
+      });
+      setLocalAudioStream(stream);
+
       member = await channel.join({
         name: userName,
         metadata: userName,
       });
-      member.onJoined.add(() => {
-        console.log(`member ${member.name} joined self`);
-      });
-      member.onLeft.add(() => {
-        console.log(`member ${member.name} left self`);
-      });
+
+      if (stream) {
+        const publication = await member.publish(stream);
+        setAudioMyPublication(publication);
+      }
+      const localDataStream = new LocalDataStream();
+      setLocalDataStream(localDataStream);
+      const publication = await member.publish(localDataStream);
+      setMyTextPublication(publication);
+
       member.onStreamSubscribed.add(({ subscription }) => {
         console.log(`member ${member.name} subscribed ${subscription.contentType} ${subscription.id}`);
         if (subscription && subscription.stream && subscription.stream.contentType === 'data') {
@@ -189,12 +212,15 @@ const Chat = () => {
         }
       });
 
-      setMembers([...channel.members.filter((m) => m.name !== userName && m.subtype !== SfuBotMember.subtype)]);
+      const otherMembers = channel.members.filter((m) => m.name !== userName && m.subtype !== SfuBotMember.subtype);
+      setMembers([...otherMembers]);
       setSkyWayChannel(channel);
       setMemberMySelf(member);
     })();
 
     return () => {
+      localStream?.getTracks().forEach((t) => t.stop());
+      localStream = null;
       localAudioStream?.track.stop();
       setLocalAudioStream(null);
       currentScreenStream.stream?.track.stop();
