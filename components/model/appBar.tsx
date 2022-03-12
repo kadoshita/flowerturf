@@ -1,4 +1,4 @@
-import { AccountCircle, HeadsetMic, Settings } from '@mui/icons-material';
+import { AccountCircle, GitHub, HeadsetMic, Settings } from '@mui/icons-material';
 import {
   Box,
   AppBar,
@@ -78,6 +78,14 @@ const MenuAppBar = (props: MenuAppBarProps) => {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
+            <a href="https://github.com/kadoshita/flowerturf" target="_blank" rel="nofollow noopener noreferrer">
+              <MenuItem>
+                <ListItemIcon>
+                  <GitHub></GitHub>
+                </ListItemIcon>
+                <ListItemText>GitHub (バグ報告)</ListItemText>
+              </MenuItem>
+            </a>
             <MenuItem onClick={onOpenUserNameChangeDialog}>
               <ListItemIcon>
                 <AccountCircle></AccountCircle>
