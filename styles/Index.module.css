@@ -85,6 +85,10 @@
   max-width: 300px;
 }
 
+.wip {
+  background-color: #666666;
+}
+
 .card:hover,
 .card:focus,
 .card:active {

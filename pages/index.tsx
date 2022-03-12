@@ -36,14 +36,14 @@ const Index: NextPage = () => {
             <p>音声と同時に画面の映像を共有可能</p>
           </div>
 
-          <div className={styles.card}>
+          <div className={`${styles.card} ${styles.wip}`}>
             <h2>Youtube同時視聴</h2>
-            <p>Youtubeのリンクを共有すれば、全員で同時に動画を見ることができます</p>
+            <p>Youtubeのリンクを共有すれば、全員で同時に動画を見ることができます (WIP)</p>
           </div>
 
-          <div className={styles.card}>
+          <div className={`${styles.card} ${styles.wip}`}>
             <h2>配信モード</h2>
-            <p>話している内容をラジオ放送のように複数人に配信できます</p>
+            <p>話している内容をラジオ放送のように複数人に配信できます (WIP)</p>
           </div>
         </div>
       </main>
