@@ -100,7 +100,7 @@ const UserItem = (props: UserItemProps) => {
     <Box sx={style.box}>
       <Typography variant="h5">{props.name}</Typography>
       <Avatar sx={style.avatar(props.name)}>{props.name.at(0)}</Avatar>
-      <audio ref={audioRef} autoPlay></audio>
+      <audio ref={audioRef} autoPlay playsInline></audio>
       <Tooltip title={`ミュート${isMuted ? '解除' : ''}します`}>
         <Fab size="medium" style={style.fab} onClick={handleMuteChange}>
           {isMuted ? <VolumeOff></VolumeOff> : <VolumeUp></VolumeUp>}

@@ -19,7 +19,7 @@ const ShareScreen = () => {
   }, [currentScreenStream]);
 
   if (currentScreenStream.stream) {
-    return <video ref={videoRef} autoPlay style={{ width: '100%' }}></video>;
+    return <video ref={videoRef} autoPlay playsInline style={{ width: '100%' }}></video>;
   } else {
     return <></>;
   }
