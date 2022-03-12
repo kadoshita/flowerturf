@@ -27,9 +27,7 @@ const ChatMessageItem = (props: ChatMessageItemProps) => {
             <Linkify tagName="span" options={{ rel: 'nofollow noopener', target: '_blank' }}>
               {props.message}
             </Linkify>
-            <p style={{ textAlign: 'right', margin: '0px' }}>
-              <small>{props.sendAt}</small>
-            </p>
+            <small style={{ float: 'right' }}>{props.sendAt}</small>
           </>
         }
         ref={messageRef}
