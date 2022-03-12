@@ -72,11 +72,15 @@ const UserItem = (props: UserItemProps) => {
         return;
       }
       if (props.subscription === undefined) {
-        audioRef.current.srcObject = null;
         audioRef.current.pause();
+        audioRef.current.srcObject = null;
       } else {
         const { stream } = props.subscription;
         if (stream && stream.contentType === 'audio') {
+          if (audioRef.current.srcObject !== null) {
+            audioRef.current.pause();
+            audioRef.current.srcObject = null;
+          }
           stream.attach(audioRef.current);
           await audioRef.current.play();
         }
