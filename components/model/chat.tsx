@@ -92,6 +92,9 @@ const Chat = () => {
       channel.onClosed.add(() => {
         console.log(`channel ${channel.name} closed`);
       });
+      channel.onMemberMetadataUpdated.add(() => {
+        setMembers(channel.members.filter((m) => m.subtype !== SfuBotMember.subtype && m.name !== userName));
+      });
       channel.onMemberJoined.add(({ member }) => {
         if (member.subtype !== SfuBotMember.subtype) {
           console.log(`member ${member.name} joined`);
@@ -170,7 +173,7 @@ const Chat = () => {
             dispatch(
               updateChatMessage({
                 message: data as unknown as string,
-                sender: subscription.publication.publisher.name || 'unknown',
+                sender: subscription.publication.publisher.metadata || 'unknown',
                 direction: 'incoming',
                 sendTime: new Date().toLocaleTimeString(),
               })
@@ -238,6 +241,12 @@ const Chat = () => {
       })();
     };
   }, []);
+
+  useEffect(() => {
+    if (userName !== '' && memberMySelf) {
+      memberMySelf.updateMetadata(userName);
+    }
+  }, [userName]);
 
   useEffect(() => {
     if (isMuted) {
@@ -330,7 +339,7 @@ const Chat = () => {
           return (
             <Grid item xs={6} lg={3} key={i}>
               <UserItem
-                name={m.name || ''}
+                name={m.metadata || ''}
                 subscription={subscriptions.find((s) => s.publication.publisher.name === m.name)}
               ></UserItem>
             </Grid>
