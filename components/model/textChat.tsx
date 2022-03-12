@@ -37,6 +37,7 @@ const TextChat = () => {
         position: 'relative',
         height: 'calc(100vmin - 64px)',
         backgroundColor: themeOptions.palette?.background?.paper,
+        minHeight: '100%',
       }}
     >
       <div style={{ overflowY: 'scroll', height: 'calc(100% - 112px)' }}>

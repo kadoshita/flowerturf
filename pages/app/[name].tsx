@@ -30,12 +30,12 @@ const App = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <MenuAppBar roomName={roomName} userName={userName}></MenuAppBar>
-      <Grid container style={{ height: 'calc(100vmin - 64px)' }}>
+      <Grid container style={{ height: 'calc(100vmin - 64px)', minHeight: 'calc(100vh - 64px)' }}>
         <Grid item xs={12} lg={10} className="user-items">
           <ShareScreen></ShareScreen>
           <Chat></Chat>
         </Grid>
-        <Grid item xs={12} lg={2}>
+        <Grid item xs={12} lg={2} style={{ minHeight: '80vh' }}>
           <TextChat></TextChat>
         </Grid>
       </Grid>
