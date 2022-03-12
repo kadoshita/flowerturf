@@ -1,16 +1,13 @@
 import { Button } from '@mui/material';
 import type { NextPage } from 'next';
-import Head from 'next/head';
 import Link from 'next/link';
+import Header from '../components/model/header';
 import styles from '../styles/Index.module.css';
 
 const Index: NextPage = () => {
   return (
     <div className={styles.container}>
-      <Head>
-        <title>FlowerTurf</title>
-        <meta name="description" content="複数人対応、インストール不要のボイスチャットツール - FlowerTurf" />
-      </Head>
+      <Header></Header>
 
       <main className={styles.main}>
         <h1 className={styles.title}>FlowerTurf</h1>
