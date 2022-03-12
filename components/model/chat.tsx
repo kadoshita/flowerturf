@@ -45,34 +45,44 @@ const Chat = () => {
   const router = useRouter();
 
   useEffect(() => {
+    let unmounted = false;
     let localStream: MediaStream | null;
-    (async () => {
+    const updateDevice = async () => {
       localAudioStream?.track.stop();
       localStream = await navigator.mediaDevices.getUserMedia({
         video: false,
         audio: { deviceId: audioInputDevice },
       });
-      console.log(audioInputDevice, localStream);
       const [track] = localStream.getAudioTracks();
       if (localAudioStream) {
         localAudioStream.replaceTrack(track);
       } else {
+        if (unmounted) {
+          return;
+        }
         const stream = new LocalAudioStream('audio', track);
         stream.track.addEventListener('ended', () => {
           setLocalAudioStream(null);
         });
         setLocalAudioStream(stream);
       }
-    })();
+    };
+
+    if (!unmounted) {
+      updateDevice();
+    }
 
     return () => {
+      unmounted = true;
       localStream?.getTracks().forEach((t) => t.stop());
       localStream = null;
     };
   }, [audioInputDevice]);
 
   useEffect(() => {
+    let unmounted = false;
     if (roomName === '' || userName === '') {
+      unmounted = true;
       const { name } = router.query;
       if (typeof name === 'string' && name !== '') {
         dispatch(updateRoomName(name));
@@ -84,7 +94,7 @@ const Chat = () => {
     let member: LocalPerson;
     let channel: Channel;
     let localStream: MediaStream | null;
-    (async () => {
+    const init = async () => {
       const authServerUrl = process.env.NEXT_PUBLIC_SKYWAY_AUTH_SERVER_URL || '';
       const res = await fetch(`${authServerUrl}?roomName=${roomName}`);
       const json = await res.json();
@@ -151,7 +161,6 @@ const Chat = () => {
         video: false,
         audio: { deviceId: audioInputDevice },
       });
-      console.log(audioInputDevice, localStream);
       const [track] = localStream.getAudioTracks();
 
       const stream = new LocalAudioStream('audio', track);
@@ -227,9 +236,14 @@ const Chat = () => {
       setMembers([...otherMembers]);
       setSkyWayChannel(channel);
       setMemberMySelf(member);
-    })();
+    };
+
+    if (!unmounted) {
+      init();
+    }
 
     return () => {
+      unmounted = true;
       localStream?.getTracks().forEach((t) => t.stop());
       localStream = null;
       localAudioStream?.track.stop();
