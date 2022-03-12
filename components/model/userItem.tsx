@@ -52,6 +52,10 @@ const style: { box: SxProps; avatar: (name: string) => SxProps; fab: React.CSSPr
     alignSelf: 'end',
     marginRight: '8px',
     marginBottom: '8px',
+    width: '10vmin',
+    height: '10vmin',
+    maxHeight: '48px',
+    maxWidth: '48px',
   },
 };
 const UserItem = (props: UserItemProps) => {

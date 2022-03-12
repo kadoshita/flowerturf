@@ -55,7 +55,11 @@ const style: { box: SxProps; avatar: (name: string) => SxProps; fabs: React.CSSP
       marginBottom: '8px',
     },
     fab: {
-      marginLeft: '4px',
+      marginLeft: '8px',
+      width: '10vmin',
+      height: '10vmin',
+      maxHeight: '48px',
+      maxWidth: '48px',
     },
   };
 const MySelfUserItem = (props: UserItemProps) => {

@@ -39,6 +39,3 @@ a {
   overflow-y: scroll;
   scrollbar-width: none;
 }
-.user-items::-webkit-scrollbar {
-  display: none;
-}
