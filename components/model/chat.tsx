@@ -114,17 +114,12 @@ const Chat = () => {
         setMembers(channel.members.filter((m) => m.subtype !== SfuBotMember.subtype && m.name !== userName));
       });
       channel.onMemberJoined.add(({ member }) => {
-        if (member.subtype !== SfuBotMember.subtype) {
-          console.log(`member ${member.name} joined`);
-          if (member.name !== userName) {
-            setMembers([...members, member as RemoteMember]);
-          }
-        }
+        console.log(`member ${member.name} joined`);
+        setMembers(channel.members.filter((m) => m.subtype !== SfuBotMember.subtype && m.name !== userName));
       });
       channel.onMemberLeft.add(({ member }) => {
         console.log(`member ${member.name} left`);
-        const existMembers = members.filter((m) => m.name !== member.name);
-        setMembers([...existMembers]);
+        setMembers(channel.members.filter((m) => m.subtype !== SfuBotMember.subtype && m.name !== userName));
       });
       channel.onStreamPublished.add(async ({ publication }) => {
         console.log(`publication ${publication.id} ${publication.publisher.type} ${publication.contentType} published`);
