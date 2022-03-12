@@ -20,6 +20,8 @@ import UserItem from './userItem';
 import { clearChatMessage, updateChatMessage } from '../../store/chat';
 import { updateScreenStream } from '../../store/stream';
 import { Forwarding, SfuBotMember, SfuClientPlugin } from '@skyway-sdk/sfu-client';
+import { useRouter } from 'next/router';
+import { updateRoomName } from '../../store/room';
 
 const Chat = () => {
   const roomName: string = useSelector((state: RootState) => state.room.room.name);
@@ -40,6 +42,7 @@ const Chat = () => {
   const [members, setMembers] = useState<RemoteMember[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const dispatch = useDispatch();
+  const router = useRouter();
 
   useEffect(() => {
     let localStream: MediaStream | null;
@@ -70,6 +73,11 @@ const Chat = () => {
 
   useEffect(() => {
     if (roomName === '' || userName === '') {
+      const { name } = router.query;
+      if (typeof name === 'string' && name !== '') {
+        dispatch(updateRoomName(name));
+      }
+      router.push('/home');
       return;
     }
     let context: SkyWayContext;

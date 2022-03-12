@@ -3,11 +3,12 @@ import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import MenuAppBar from '../../components/model/appBar';
 import TextChat from '../../components/model/textChat';
 import { RootState } from '../../store';
 import ShareScreen from '../../components/model/shareScreen';
+import { updateRoomName } from '../../store/room';
 
 const Chat = dynamic(() => import('../../components/model/chat'), { ssr: false });
 
@@ -15,12 +16,17 @@ const App = () => {
   const router = useRouter();
   const roomName: string = useSelector((state: RootState) => state.room.room.name);
   const userName: string = useSelector((state: RootState) => state.user.user.name);
+  const dispatch = useDispatch();
+  const { name } = router.query;
 
   useEffect(() => {
-    if (roomName === '' || userName === '') {
+    if (userName == '') {
+      if (typeof name === 'string' && name !== '') {
+        dispatch(updateRoomName(name));
+      }
       router.push('/home');
     }
-  }, []);
+  }, [name]);
 
   return (
     <div>
