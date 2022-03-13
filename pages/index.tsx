@@ -1,19 +1,13 @@
 import { Button } from '@mui/material';
-import type { GetStaticProps, NextPage } from 'next';
+import type { NextPage } from 'next';
 import Link from 'next/link';
 import Header from '../components/model/header';
 import styles from '../styles/Index.module.css';
 
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {},
-  };
-};
-
 const Index: NextPage = () => {
   return (
     <div className={styles.container}>
-      <Header title='FlowerTurf'></Header>
+      <Header title="FlowerTurf"></Header>
 
       <main className={styles.main}>
         <h1 className={styles.title}>FlowerTurf</h1>
