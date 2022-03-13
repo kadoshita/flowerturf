@@ -15,9 +15,25 @@ const combinedReducers = combineReducers({
   stream: streamReducer
 });
 
+// ref: https://github.com/vercel/next.js/discussions/15687#discussioncomment-45319
+const createNoopStorage = () => {
+  return {
+    getItem(_key: string) {
+      return Promise.resolve(null);
+    },
+    setItem(_key: string, value: string) {
+      return Promise.resolve(value);
+    },
+    removeItem(_key: string) {
+      return Promise.resolve();
+    },
+  };
+};
+
+const _storage = typeof window !== 'undefined' ? storage : createNoopStorage();
 const persistConfig = {
   key: 'root',
-  storage,
+  storage: _storage,
   whitelist: ['device', 'user']
 };
 
