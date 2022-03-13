@@ -9,24 +9,30 @@ import { persistor, RootState } from '../../store';
 import ShareScreen from '../../components/model/shareScreen';
 import { updateRoomName } from '../../store/room';
 import Header from '../../components/model/header';
-import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import type { GetStaticPaths, GetStaticProps } from 'next';
 import { PersistGate } from 'redux-persist/integration/react';
 
 const Chat = dynamic(() => import('../../components/model/chat'), { ssr: false });
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps = async () => {
   return {
-    props: {
-      name: params?.name || '',
-    },
+    props: {},
   };
 };
 
-const App = ({ name }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+export const getStaticPaths: GetStaticPaths = () => {
+  return {
+    paths: ['/app/flowerturf', { params: { name: 'flowerturf' } }],
+    fallback: true,
+  };
+};
+
+const App = () => {
   const router = useRouter();
   const roomName: string = useSelector((state: RootState) => state.room.room.name);
   const userName: string = useSelector((state: RootState) => state.user.user.name);
   const dispatch = useDispatch();
+  const { name } = router.query;
 
   useEffect(() => {
     if (userName == '') {
@@ -39,7 +45,7 @@ const App = ({ name }: InferGetServerSidePropsType<typeof getServerSideProps>) =
 
   return (
     <div>
-      <Header title={`FlowerTurf ${roomName || name}`}></Header>
+      <Header title={`FlowerTurf ${roomName}`}></Header>
 
       <PersistGate loading={null} persistor={persistor}>
         <MenuAppBar roomName={roomName} userName={userName}></MenuAppBar>
