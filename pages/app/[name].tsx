@@ -39,7 +39,7 @@ const App = ({ name }: InferGetServerSidePropsType<typeof getServerSideProps>) =
 
   return (
     <div>
-      <Header title={`FlowerTurf ${roomName || name}`}></Header>
+      <Header title="FlowerTurf" roomName={roomName || name}></Header>
 
       <PersistGate loading={null} persistor={persistor}>
         <MenuAppBar roomName={roomName} userName={userName}></MenuAppBar>
