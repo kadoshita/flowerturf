@@ -1,8 +1,13 @@
 import Head from 'next/head';
 
-const Header = () => {
+export type HeaderProps = {
+  title: string;
+};
+
+const Header = (props: HeaderProps) => {
   return (
     <Head>
+      <title>{props.title}</title>
       <link rel="icon" href="/favicon.ico" />
 
       <meta name="theme-color" content="#009688" />

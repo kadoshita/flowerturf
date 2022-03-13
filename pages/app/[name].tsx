@@ -9,8 +9,22 @@ import { RootState } from '../../store';
 import ShareScreen from '../../components/model/shareScreen';
 import { updateRoomName } from '../../store/room';
 import Header from '../../components/model/header';
+import type { GetStaticPaths, GetStaticProps } from 'next';
 
 const Chat = dynamic(() => import('../../components/model/chat'), { ssr: false });
+
+export const getStaticProps: GetStaticProps = async () => {
+  return {
+    props: {},
+  };
+};
+
+export const getStaticPaths: GetStaticPaths = () => {
+  return {
+    paths: ['/app/flowerturf', { params: { name: 'flowerturf' } }],
+    fallback: true,
+  };
+};
 
 const App = () => {
   const router = useRouter();
@@ -30,7 +44,7 @@ const App = () => {
 
   return (
     <div>
-      <Header></Header>
+      <Header title={`FlowerTurf ${roomName}`}></Header>
 
       <MenuAppBar roomName={roomName} userName={userName}></MenuAppBar>
       <Grid container style={{ height: 'calc(100vmin - 64px)', minHeight: 'calc(100vh - 64px)' }}>
