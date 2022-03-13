@@ -9,23 +9,9 @@ import { persistor, RootState } from '../../store';
 import ShareScreen from '../../components/model/shareScreen';
 import { updateRoomName } from '../../store/room';
 import Header from '../../components/model/header';
-import type { GetStaticPaths, GetStaticProps } from 'next';
 import { PersistGate } from 'redux-persist/integration/react';
 
 const Chat = dynamic(() => import('../../components/model/chat'), { ssr: false });
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {},
-  };
-};
-
-export const getStaticPaths: GetStaticPaths = () => {
-  return {
-    paths: ['/app/flowerturf', { params: { name: 'flowerturf' } }],
-    fallback: true,
-  };
-};
 
 const App = () => {
   const router = useRouter();
