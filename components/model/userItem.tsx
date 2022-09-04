@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import { Avatar, Fab, Tooltip, Typography } from '@mui/material';
 import { Box, SxProps } from '@mui/system';
 import { VolumeOff, VolumeUp } from '@mui/icons-material';

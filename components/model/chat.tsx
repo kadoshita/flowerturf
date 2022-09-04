@@ -100,7 +100,9 @@ const Chat = () => {
       const json = await res.json();
       const { token } = json;
       context = await SkyWayContext.Create(token, {
-        logLevel: 'error',
+        log: {
+          level: 'debug',
+        },
       });
       const plugin = new SfuClientPlugin();
       context.registerPlugin(plugin);
@@ -247,7 +249,13 @@ const Chat = () => {
       dispatch(updateScreenStream({ isSharing: false, stream: null }));
       dispatch(clearChatMessage());
       (async () => {
-        if (roomName === '' || userName === '') {
+        if (
+          roomName === '' ||
+          userName === '' ||
+          member === undefined ||
+          channel === undefined ||
+          context === undefined
+        ) {
           return;
         }
         await member.leave();
