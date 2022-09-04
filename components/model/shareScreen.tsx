@@ -19,6 +19,7 @@ const ShareScreen = () => {
   }, [currentScreenStream]);
 
   if (currentScreenStream.stream) {
+    // eslint-disable-next-line react/no-unknown-property
     return <video ref={videoRef} autoPlay playsInline style={{ width: '100%' }}></video>;
   } else {
     return <></>;
