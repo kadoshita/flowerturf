@@ -19,7 +19,7 @@ import fetch from 'node-fetch';
 import UserItem from './userItem';
 import { clearChatMessage, updateChatMessage } from '../../store/chat';
 import { updateScreenStream } from '../../store/stream';
-import { Forwarding, SfuBotMember, SfuClientPlugin } from '@skyway-sdk/sfu-client';
+import { Forwarding, SfuBotMember, SfuBotPlugin } from '@skyway-sdk/sfu-bot';
 import { useRouter } from 'next/router';
 import { updateRoomName } from '../../store/room';
 
@@ -54,18 +54,12 @@ const Chat = () => {
         audio: { deviceId: audioInputDevice },
       });
       const [track] = localStream.getAudioTracks();
-      if (localAudioStream) {
-        localAudioStream.replaceTrack(track);
-      } else {
-        if (unmounted) {
-          return;
-        }
-        const stream = new LocalAudioStream('audio', track);
-        stream.track.addEventListener('ended', () => {
-          setLocalAudioStream(null);
-        });
-        setLocalAudioStream(stream);
-      }
+      const stream = new LocalAudioStream(track);
+      stream.track.addEventListener('ended', () => {
+        setLocalAudioStream(null);
+      });
+      setLocalAudioStream(stream);
+      myAudioPublication?.replaceStream(stream);
     };
 
     if (!unmounted) {
@@ -100,9 +94,11 @@ const Chat = () => {
       const json = await res.json();
       const { token } = json;
       context = await SkyWayContext.Create(token, {
-        logLevel: 'error',
+        log: {
+          level: 'error',
+        },
       });
-      const plugin = new SfuClientPlugin();
+      const plugin = new SfuBotPlugin();
       context.registerPlugin(plugin);
       channel = await SkyWayChannel.FindOrCreate(context, {
         name: roomName,
@@ -158,7 +154,7 @@ const Chat = () => {
       });
       const [track] = localStream.getAudioTracks();
 
-      const stream = new LocalAudioStream('audio', track);
+      const stream = new LocalAudioStream(track);
       stream.track.addEventListener('ended', () => {
         setLocalAudioStream(null);
       });
@@ -178,7 +174,7 @@ const Chat = () => {
       const publication = await member.publish(localDataStream);
       setMyTextPublication(publication);
 
-      member.onStreamSubscribed.add(({ subscription }) => {
+      member.onPublicationSubscribed.add(({ subscription }) => {
         console.log(`member ${member.name} subscribed ${subscription.contentType} ${subscription.id}`);
         if (subscription && subscription.stream && subscription.stream.contentType === 'data') {
           subscription.stream.onData.add((data) => {
@@ -202,7 +198,7 @@ const Chat = () => {
         }
         setSubscriptions([...subscriptions, subscription]);
       });
-      member.onStreamUnsubscribed.add(({ subscription }) => {
+      member.onPublicationUnsubscribed.add(({ subscription }) => {
         console.log(`member ${subscription.id} ${subscription.contentType} unsubscribed`);
         if (subscription.contentType === 'video') {
           dispatch(
@@ -218,11 +214,7 @@ const Chat = () => {
       channel.publications.forEach(async (publication) => {
         if (member && publication.publisher.type === 'person' && publication.publisher.name !== member.name) {
           await member.subscribe(publication.id);
-        } else if (
-          member &&
-          publication.publisher.subtype === SfuBotMember.subtype &&
-          publication.origin?.publisher.name !== member.name
-        ) {
+        } else if (member && publication.publisher.subtype === SfuBotMember.subtype && publication.origin?.publisher.name !== member.name) {
           await member.subscribe(publication.id);
         }
       });
@@ -319,12 +311,22 @@ const Chat = () => {
             const [track] = stream.getVideoTracks();
             track.addEventListener('ended', async () => {
               await screenPublication.cancel();
-              dispatch(updateScreenStream({ isSharing: false, stream: null }));
+              dispatch(
+                updateScreenStream({
+                  isSharing: false,
+                  stream: null,
+                })
+              );
               setMyScreenPublication(null);
               setMyScreenForwarding(null);
             });
-            const screenStream = new LocalVideoStream('screen', track);
-            dispatch(updateScreenStream({ isSharing: true, stream: screenStream }));
+            const screenStream = new LocalVideoStream(track);
+            dispatch(
+              updateScreenStream({
+                isSharing: true,
+                stream: screenStream,
+              })
+            );
             screenPublication = await memberMySelf.publish(screenStream);
             if (screenPublication && sfuBotMember) {
               setMyScreenPublication(screenPublication);
@@ -332,7 +334,12 @@ const Chat = () => {
               setMyScreenForwarding(forwarding);
             }
           } catch (e) {
-            dispatch(updateScreenStream({ isSharing: false, stream: null }));
+            dispatch(
+              updateScreenStream({
+                isSharing: false,
+                stream: null,
+              })
+            );
             console.info('failed to get screen stream');
           }
         } else {
@@ -346,11 +353,7 @@ const Chat = () => {
     <div>
       <Grid container spacing={2} padding={1}>
         <Grid item xs={6} lg={3}>
-          <MySelfUserItem
-            name={userName}
-            onChangeMute={handleChangeMute}
-            onChangeShareScreen={handleChangeShareScreen}
-          ></MySelfUserItem>
+          <MySelfUserItem name={userName} onChangeMute={handleChangeMute} onChangeShareScreen={handleChangeShareScreen}></MySelfUserItem>
         </Grid>
         {members.map((m, i) => {
           return (
